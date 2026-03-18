@@ -414,7 +414,8 @@ class _EscobaCounterState extends State<EscobaCounter> {
                     style: GoogleFonts.raleway(
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurfaceVariant,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
