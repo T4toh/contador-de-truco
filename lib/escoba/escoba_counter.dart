@@ -384,32 +384,44 @@ class _EscobaCounterState extends State<EscobaCounter> {
           ),
         ),
         margin: const EdgeInsets.all(8),
-        child: Stack(
+        child: Column(
           children: [
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: GestureDetector(
-                    onLongPress: () => _showPlayerNameDialog(index),
-                    child: Text(
-                      name,
-                      style: GoogleFonts.raleway(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: GestureDetector(
+                onLongPress: () => _showPlayerNameDialog(index),
+                child: Text(
+                  name,
+                  style: GoogleFonts.raleway(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
                   ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Expanded(
-                  child: MatchstickCounter(points: score),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
+              ),
+            ),
+            Expanded(
+              child: MatchstickCounter(points: score),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  FilledButton.tonal(
+                    onPressed:
+                        _gameFinished ? null : () => _addPoints(index, -1),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: colorScheme.errorContainer,
+                      foregroundColor: colorScheme.onErrorContainer,
+                      minimumSize: const Size(44, 36),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                    child: const Text('-'),
+                  ),
+                  Text(
                     '$score',
                     style: GoogleFonts.raleway(
                       fontSize: 32,
@@ -417,22 +429,7 @@ class _EscobaCounterState extends State<EscobaCounter> {
                       color: colorScheme.onSurfaceVariant,
                     ),
                   ),
-                ),
-              ],
-            ),
-            Positioned(
-              left: 12,
-              bottom: 12,
-              child: FilledButton.tonal(
-                onPressed:
-                    _gameFinished ? null : () => _addPoints(index, -1),
-                style: FilledButton.styleFrom(
-                  backgroundColor: colorScheme.errorContainer,
-                  foregroundColor: colorScheme.onErrorContainer,
-                  minimumSize: const Size(44, 36),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                ),
-                child: const Text('-'),
+                ],
               ),
             ),
           ],
