@@ -1,20 +1,31 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:contador_de_truco/main.dart';
 
 void main() {
-  testWidgets('Contador de Truco smoke test', (WidgetTester tester) async {
+  testWidgets('HomeScreen renders tab navigation', (WidgetTester tester) async {
     await tester.pumpWidget(const ContadorDeTrucoApp());
 
-    expect(find.text('CONTADOR DE TRUCO'), findsOneWidget);
-    expect(find.text('15 PUNTOS'), findsOneWidget);
-    expect(find.text('30 PUNTOS'), findsOneWidget);
+    expect(find.text('Truco'), findsOneWidget);
+    expect(find.text('Escoba del 15'), findsOneWidget);
+  });
+
+  testWidgets('Truco tab shows game mode selection', (WidgetTester tester) async {
+    await tester.pumpWidget(const ContadorDeTrucoApp());
+
+    expect(find.text('A MALAS'), findsOneWidget);
+    expect(find.text('A BUENAS'), findsOneWidget);
+  });
+
+  testWidgets('Escoba tab shows player count selection', (WidgetTester tester) async {
+    await tester.pumpWidget(const ContadorDeTrucoApp());
+
+    await tester.tap(find.text('Escoba del 15'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('¿Cuántos jugadores?'), findsOneWidget);
+    expect(find.text('2 jugadores'), findsOneWidget);
+    expect(find.text('3 jugadores'), findsOneWidget);
+    expect(find.text('4 jugadores'), findsOneWidget);
   });
 }
+
