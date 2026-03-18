@@ -316,11 +316,9 @@ class _EscobaCounterState extends State<EscobaCounter> {
             child: Row(
               children: [
                 Expanded(
-                    child: _buildPlayerPanel(0, colorScheme,
-                        matchstickHeight: 100)),
+                    child: _buildPlayerPanel(0, colorScheme)),
                 Expanded(
-                    child: _buildPlayerPanel(1, colorScheme,
-                        matchstickHeight: 100)),
+                    child: _buildPlayerPanel(1, colorScheme)),
               ],
             ),
           ),
@@ -328,11 +326,9 @@ class _EscobaCounterState extends State<EscobaCounter> {
             child: Row(
               children: [
                 Expanded(
-                    child: _buildPlayerPanel(2, colorScheme,
-                        matchstickHeight: 100)),
+                    child: _buildPlayerPanel(2, colorScheme)),
                 Expanded(
-                    child: _buildPlayerPanel(3, colorScheme,
-                        matchstickHeight: 100)),
+                    child: _buildPlayerPanel(3, colorScheme)),
               ],
             ),
           ),
@@ -345,17 +341,13 @@ class _EscobaCounterState extends State<EscobaCounter> {
           ? Column(
               children: List.generate(
                 3,
-                (i) => Expanded(
-                    child: _buildPlayerPanel(i, colorScheme,
-                        matchstickHeight: 100)),
+                (i) => Expanded(child: _buildPlayerPanel(i, colorScheme)),
               ),
             )
           : Row(
               children: List.generate(
                 3,
-                (i) => Expanded(
-                    child: _buildPlayerPanel(i, colorScheme,
-                        matchstickHeight: 120)),
+                (i) => Expanded(child: _buildPlayerPanel(i, colorScheme)),
               ),
             );
     }
@@ -376,8 +368,7 @@ class _EscobaCounterState extends State<EscobaCounter> {
           );
   }
 
-  Widget _buildPlayerPanel(int index, ColorScheme colorScheme,
-      {double matchstickHeight = 150}) {
+  Widget _buildPlayerPanel(int index, ColorScheme colorScheme) {
     final score = _scores[index];
     final name = _playerNames[index];
 
@@ -396,28 +387,33 @@ class _EscobaCounterState extends State<EscobaCounter> {
         child: Stack(
           children: [
             Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                GestureDetector(
-                  onLongPress: () => _showPlayerNameDialog(index),
-                  child: Text(
-                    name,
-                    style: GoogleFonts.raleway(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: GestureDetector(
+                    onLongPress: () => _showPlayerNameDialog(index),
+                    child: Text(
+                      name,
+                      style: GoogleFonts.raleway(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                MatchstickCounter(
-                    points: score, height: matchstickHeight),
-                Text(
-                  '$score',
-                  style: GoogleFonts.raleway(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: MatchstickCounter(points: score),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    '$score',
+                    style: GoogleFonts.raleway(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w600,
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),

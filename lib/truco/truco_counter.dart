@@ -403,16 +403,18 @@ class _TrucoCounterState extends State<TrucoCounter>
         child: Stack(
           children: [
             Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                GestureDetector(
-                  onLongPress: () => _showTeamNameDialog(team),
-                  child: Text(
-                    name,
-                    style: GoogleFonts.raleway(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: GestureDetector(
+                    onLongPress: () => _showTeamNameDialog(team),
+                    child: Text(
+                      name,
+                      style: GoogleFonts.raleway(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
                   ),
                 ),
@@ -434,16 +436,21 @@ class _TrucoCounterState extends State<TrucoCounter>
                           : colorScheme.onSurface,
                     ),
                   ),
-                ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: MatchstickCounter(points: score),
+                Expanded(
+                  child: ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: MatchstickCounter(points: score, groupsPerRow: 3),
+                  ),
                 ),
-                Text(
-                  '$score',
-                  style: GoogleFonts.raleway(
-                    fontSize: 40,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurfaceVariant,
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text(
+                    '$score',
+                    style: GoogleFonts.raleway(
+                      fontSize: 40,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],

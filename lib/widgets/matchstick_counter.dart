@@ -3,26 +3,23 @@ import 'package:google_fonts/google_fonts.dart';
 
 class MatchstickCounter extends StatelessWidget {
   final int points;
-  final double height;
+  final int groupsPerRow;
 
   const MatchstickCounter({
     super.key,
     required this.points,
-    this.height = 180,
+    this.groupsPerRow = 1,
   });
 
   @override
   Widget build(BuildContext context) {
     if (points == 0) {
-      return SizedBox(
-        height: height,
-        child: Center(
-          child: Text(
-            '—',
-            style: GoogleFonts.raleway(
-              fontSize: 60,
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
+      return Center(
+        child: Text(
+          '—',
+          style: GoogleFonts.raleway(
+            fontSize: 60,
+            color: Theme.of(context).colorScheme.outlineVariant,
           ),
         ),
       );
@@ -42,8 +39,10 @@ class MatchstickCounter extends StatelessWidget {
     }
 
     List<Widget> rows = [];
-    for (int i = 0; i < allGroups.length; i += 3) {
-      int end = (i + 3 < allGroups.length) ? i + 3 : allGroups.length;
+    for (int i = 0; i < allGroups.length; i += groupsPerRow) {
+      int end = (i + groupsPerRow < allGroups.length)
+          ? i + groupsPerRow
+          : allGroups.length;
       rows.add(
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -57,18 +56,16 @@ class MatchstickCounter extends StatelessWidget {
       );
     }
 
-    return SizedBox(
-      height: height,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: rows.map((row) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: row,
-            );
-          }).toList(),
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: rows.map((row) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: row,
+          );
+        }).toList(),
       ),
     );
   }
