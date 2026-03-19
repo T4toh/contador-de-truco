@@ -56,9 +56,9 @@ class MatchstickCounter extends StatelessWidget {
       );
     }
 
-    return SingleChildScrollView(
+    return FittedBox(
+      fit: BoxFit.contain,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: rows.map((row) {
           return Padding(
@@ -143,5 +143,6 @@ class MatchstickGroupPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant MatchstickGroupPainter oldDelegate) =>
+      oldDelegate.count != count;
 }
