@@ -56,7 +56,7 @@ class MatchstickCounter extends StatelessWidget {
       );
     }
 
-    return Center(
+    return SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
