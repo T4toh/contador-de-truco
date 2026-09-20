@@ -69,22 +69,6 @@ void main() {
 
   testWidgets('un nombre puesto por el usuario sobrevive a una partida nueva',
       (tester) async {
-    // Simplificación: en vez de escribir el nombre a través del diálogo de
-    // renombrar (mostrarNameDialog), se precarga en el storage un nombre
-    // "puesto a mano" para el equipo 0, ya con la partida arrancada a un
-    // punto del tope. Se probó primero la vía real (longPress → escribir →
-    // Guardar) y dispara un bug de framework preexistente y ajeno a estos
-    // fixes: `name_dialog.dart` dispone el TextEditingController en el
-    // `.then()` apenas se resuelve el pop, mientras el AlertDialog todavía
-    // está en su animación de salida; el siguiente pump reconstruye ese
-    // TextField con el controller ya disposed ("A TextEditingController was
-    // used after being disposed"), y de ahí en más el árbol de widgets queda
-    // corrupto (llega a lanzar '_dependents.isEmpty': is not true). Pasa
-    // igual con un solo pump() o con pumpAndSettle(), así que no hay forma
-    // de expresar ese paso con lo que da flutter_test sin taparlo a mano.
-    // Se reporta aparte; acá se prueba la regresión real de Fix 1 (que
-    // `empezar` no pise nombres) sin pasar por ese camino roto.
-    //
     // Viewport de teléfono normal (no el 800x600 por defecto de flutter
     // test): con el default, la planilla de ganador desborda y el botón
     // "Nueva Partida" queda fuera del área tocable.
@@ -96,7 +80,7 @@ void main() {
       'truco_tope': 15,
       'truco_empezada': true,
       'truco_participantes': 2,
-      'truco_name_0': 'Los Pibes',
+      'truco_name_0': 'Nosotros',
       'truco_name_1': 'Ellos',
       'truco_score_0': 14,
       'truco_score_1': 0,
@@ -105,6 +89,19 @@ void main() {
       MaterialApp(theme: mesaTheme(), home: CounterScreen(spec: truco)),
     );
     await tester.pump();
+    expect(find.text('Nosotros'), findsOneWidget);
+
+    // Renombrar de verdad: mantener presionado, escribir y guardar (Fix 1:
+    // el diálogo ya no crashea porque el TextFormField maneja su propio
+    // controller en vez de que name_dialog.dart lo disponga a destiempo).
+    await tester.longPress(find.text('Nosotros'));
+    await tester.pumpAndSettle();
+    expect(find.text('Nombre del equipo'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextFormField), 'Los Pibes');
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Los Pibes'), findsOneWidget);
 
     // Un punto más termina la partida y muestra la planilla de ganador.
@@ -116,7 +113,7 @@ void main() {
     await tester.tap(find.text('Nueva Partida'));
     await tester.pumpAndSettle();
 
-    // Partida nueva: el nombre puesto a mano debe seguir ahí (Fix 1).
+    // Partida nueva: el nombre renombrado debe seguir ahí (Fix 1).
     await tester.tap(find.text('A MALAS'));
     await tester.pump();
 
