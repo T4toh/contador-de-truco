@@ -132,6 +132,14 @@ void main() {
 
     expect(find.text('0'), findsNWidgets(2));
 
+    final lapiz = find.ancestor(
+      of: find.byIcon(Icons.edit).first,
+      matching: find.byType(SizedBox),
+    ).first;
+    final area = tester.getSize(lapiz);
+    expect(area.width, greaterThanOrEqualTo(48));
+    expect(area.height, greaterThanOrEqualTo(48));
+
     await tester.tap(find.byIcon(Icons.edit).first);
     await tester.pumpAndSettle();
 

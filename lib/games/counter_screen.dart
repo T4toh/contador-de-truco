@@ -215,8 +215,9 @@ class _CounterScreenState extends State<CounterScreen> {
                     style: FilledButton.styleFrom(
                       backgroundColor: MesaColors.maderaClara,
                       foregroundColor: MesaColors.crema,
+                      minimumSize: const Size(360, 0),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 64, vertical: 22),
+                          horizontal: 24, vertical: 22),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                         side: const BorderSide(color: MesaColors.dorado),

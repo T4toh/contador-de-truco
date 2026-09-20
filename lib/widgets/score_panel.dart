@@ -55,13 +55,17 @@ class ScorePanel extends StatelessWidget {
                     const SizedBox(width: 6),
                     GestureDetector(
                       onTap: onRenombrar,
-                      // Área de toque cómoda sin agrandar el ícono.
-                      child: Padding(
-                        padding: const EdgeInsets.all(6),
+                      // El ícono queda chico, pero el área de toque cumple el
+                      // mínimo de 48x48: al lado hay un área que suma puntos,
+                      // así que errarle no puede costar un punto de más.
+                      behavior: HitTestBehavior.opaque,
+                      child: const SizedBox(
+                        width: 48,
+                        height: 48,
                         child: Icon(
                           Icons.edit,
-                          size: 16,
-                          color: MesaColors.doradoClaro.withValues(alpha: .65),
+                          size: 18,
+                          color: MesaColors.doradoClaro,
                         ),
                       ),
                     ),
