@@ -10,7 +10,13 @@ Future<void> main() async {
   // dos CounterScreen montados a la vez la ejecutarían en paralelo y podrían
   // pisarse entre sí.
   WidgetsFlutterBinding.ensureInitialized();
-  await GameStorage().migrar();
+  try {
+    await GameStorage().migrar();
+  } catch (e, stack) {
+    // Si la migración falla, se pierde la partida vieja pero la app abre.
+    // Preferible a una pantalla en blanco.
+    debugPrint('Falló la migración de datos guardados: $e\n$stack');
+  }
   runApp(const ContadorDeTrucoApp());
 }
 
