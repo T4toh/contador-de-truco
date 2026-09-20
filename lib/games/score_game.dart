@@ -26,6 +26,11 @@ class ScoreGame {
 
   factory ScoreGame.nueva(GameSpec spec) {
     final cuantos = spec.participantes.first;
+    assert(
+      spec.nombresPorDefecto.length >= cuantos,
+      'nombresPorDefecto de "${spec.id}" tiene ${spec.nombresPorDefecto.length} '
+      'nombres pero la partida arranca con $cuantos participantes',
+    );
     return ScoreGame(
       spec: spec,
       tope: spec.topes.first,
@@ -37,6 +42,11 @@ class ScoreGame {
   int get participantes => puntajes.length;
 
   void empezar({required int tope, required int participantes}) {
+    assert(
+      spec.nombresPorDefecto.length >= participantes,
+      'nombresPorDefecto de "${spec.id}" tiene ${spec.nombresPorDefecto.length} '
+      'nombres pero la partida arranca con $participantes participantes',
+    );
     this.tope = tope;
     puntajes = List.filled(participantes, 0);
     nombres = spec.nombresPorDefecto.take(participantes).toList();

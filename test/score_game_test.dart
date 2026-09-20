@@ -60,6 +60,8 @@ void main() {
   test('terminada ignora sumas posteriores', () {
     final g = ScoreGame.nueva(specTruco)..empezar(tope: 15, participantes: 2);
     g.sumar(0, 15);
+    expect(g.terminada, isTrue);
+    expect(g.puntajes[0], 15);
     g.sumar(1, 3);
     expect(g.puntajes[1], 0);
   });
