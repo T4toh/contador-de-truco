@@ -35,13 +35,13 @@ class _CounterScreenState extends State<CounterScreen> {
   }
 
   Future<void> _cargar() async {
-    await _storage.migrar();
     final juego = await _storage.cargar(widget.spec);
     if (!mounted) return;
     setState(() => _juego = juego);
   }
 
   void _sumar(int indice, int puntos) {
+    if (_juego.terminada) return;
     setState(() => _juego.sumar(indice, puntos));
     _storage.guardar(_juego);
     if (_juego.terminada) _mostrarGanador();
@@ -73,6 +73,8 @@ class _CounterScreenState extends State<CounterScreen> {
   }
 
   Future<void> _renombrar(int indice) async {
+    // "Equipo" solo para juegos de exactamente dos bandos fijos, como Truco.
+    // Cualquier otro caso —elige cantidad, o tiene tres o más fijos— es "jugador".
     final nombre = await mostrarNameDialog(
       context,
       titulo: widget.spec.participantes.first > 2 || widget.spec.eligeParticipantes

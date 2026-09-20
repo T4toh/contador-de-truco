@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'games/catalog.dart';
 import 'games/counter_screen.dart';
+import 'games/game_storage.dart';
 import 'theme/mesa_theme.dart';
 
-void main() {
+Future<void> main() async {
+  // La migración corre una sola vez, antes de que exista cualquier pantalla:
+  // dos CounterScreen montados a la vez la ejecutarían en paralelo y podrían
+  // pisarse entre sí.
+  WidgetsFlutterBinding.ensureInitialized();
+  await GameStorage().migrar();
   runApp(const ContadorDeTrucoApp());
 }
 
