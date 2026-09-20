@@ -85,28 +85,45 @@ class ScorePanel extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: MatchstickCounter(
-                points: puntaje,
-                gruposPorColumna: gruposPorColumna,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  FilledButton.tonal(
-                    onPressed: onRestar,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: MesaColors.brasa,
-                      foregroundColor: MesaColors.crema,
-                      minimumSize: const Size(44, 36),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                child: Row(
+                  children: [
+                    // El botón queda abajo a la izquierda, donde cae el pulgar.
+                    SizedBox(
+                      width: 64,
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: FilledButton.tonal(
+                          onPressed: onRestar,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: MesaColors.brasa,
+                            foregroundColor: MesaColors.crema,
+                            minimumSize: const Size(44, 36),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                          ),
+                          child: const Text('−'),
+                        ),
+                      ),
                     ),
-                    child: const Text('−'),
-                  ),
-                  Text('$puntaje', style: textos.displaySmall),
-                ],
+                    Expanded(child: MatchstickCounter(
+                      points: puntaje,
+                      gruposPorColumna: gruposPorColumna,
+                    )),
+                    // El puntaje llena el hueco de la derecha en vez de
+                    // comerse una franja de alto abajo.
+                    SizedBox(
+                      width: 96,
+                      child: Center(
+                        child: Text(
+                          '$puntaje',
+                          style: textos.displaySmall,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

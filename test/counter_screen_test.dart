@@ -224,5 +224,9 @@ void main() {
 
     expect(xs.length, 2, reason: 'dos columnas');
     expect(ys.length, 3, reason: 'tres filas por columna');
+
+    // El puntaje se movió al costado del contador: sigue visible y
+    // encontrable, no lo tapó el traslado.
+    expect(find.text('28'), findsOneWidget);
   });
 }
