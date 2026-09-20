@@ -1,7 +1,7 @@
 #!/bin/bash
 
 APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
-PACKAGE_NAME="com.example.contador_de_truco"
+PACKAGE_NAME="io.github.t4toh.contadordetruco"
 
 echo "📱 Instalando Contador de Truco en dispositivo Android..."
 echo ""

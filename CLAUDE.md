@@ -18,7 +18,7 @@ Sin Android SDK ni Chrome disponibles, la verificación visual se hace con
 `flutter run -d web-server --web-port=8080` y Firefox; redimensionar la ventana simula tablet y
 horizontal.
 
-`applicationId` sigue siendo `com.example.contador_de_truco` (default del template).
+`applicationId`: `io.github.t4toh.contadordetruco`. Se usa el namespace `io.github.<usuario>` porque no hay dominio propio; es la convención habitual para apps sin dominio.
 
 ## Arquitectura
 

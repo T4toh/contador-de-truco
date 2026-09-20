@@ -135,8 +135,10 @@ de tab no pierde la partida del otro juego.
 
 - **Generala**: las reglas están en `docs/generala.md` pero no hay código. Su planilla de 13 casillas
   no encaja en el patrón "contador de puntos" de los otros dos juegos.
-- **`applicationId`**: sigue siendo `com.example.contador_de_truco`, el default del template. Hay que
-  cambiarlo antes de publicar en Play Store.
+- **Firma del APK**: los builds se firman con la clave de debug del template, así que un APK
+  compilado en otra máquina no puede actualizar al instalado — hay que desinstalar y perder la
+  partida guardada. Para poder repartir versiones nuevas sin eso, hace falta generar un keystore
+  propio y configurarlo en `android/app/build.gradle.kts`. Va de la mano con el punto anterior.
 - **Actualizar desde adentro de la app**: hoy la única forma de instalar una versión nueva es
   compilar el APK y pasarlo por USB. Hay que buscar cómo hacerlo desde la app misma. Tres caminos,
   de menor a mayor compromiso:

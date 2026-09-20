@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.contador_de_truco"
+    namespace = "io.github.t4toh.contadordetruco"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.contador_de_truco"
+        applicationId = "io.github.t4toh.contadordetruco"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

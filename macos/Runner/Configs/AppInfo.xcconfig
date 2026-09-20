@@ -8,7 +8,7 @@
 PRODUCT_NAME = contador_de_truco
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.contadorDeTruco
+PRODUCT_BUNDLE_IDENTIFIER = io.github.t4toh.contadorDeTruco
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025 Tatoh. All rights reserved.
