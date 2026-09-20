@@ -50,4 +50,29 @@ void main() {
     final l = calcularLayout(puntos: 23, espacio: const Size(200, 300));
     expect(l.columnas * l.filas, greaterThanOrEqualTo(5)); // 23 puntos = 5 grupos
   });
+
+  test('no elige un grupo más ancho que el espacio disponible', () {
+    final l = calcularLayout(puntos: 1, espacio: const Size(80, 400));
+    final ancho = l.columnas * l.tamanoGrupo + (l.columnas - 1) * 8;
+    expect(ancho, lessThanOrEqualTo(80));
+    expect(l.tamanoGrupo, lessThanOrEqualTo(80));
+  });
+
+  test('el ancho ocupado nunca excede el espacio, salvo el caso degradado', () {
+    for (final ancho in [80.0, 150.0, 320.0, 600.0, 1024.0]) {
+      for (final alto in [60.0, 120.0, 220.0, 400.0, 768.0]) {
+        for (final puntos in [1, 5, 8, 15, 23, 30]) {
+          final l = calcularLayout(puntos: puntos, espacio: Size(ancho, alto));
+          final ocupado = l.columnas * l.tamanoGrupo + (l.columnas - 1) * 8;
+          // El único caso permitido de desborde es el degradado: una sola
+          // columna al tamaño mínimo en un espacio más angosto que eso.
+          final degradado = l.columnas == 1 && l.tamanoGrupo == 44;
+          if (!degradado) {
+            expect(ocupado, lessThanOrEqualTo(ancho),
+                reason: 'ancho=$ancho alto=$alto puntos=$puntos');
+          }
+        }
+      }
+    }
+  });
 }

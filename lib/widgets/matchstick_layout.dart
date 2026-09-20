@@ -33,6 +33,7 @@ MatchLayout calcularLayout({
 
   for (var tamano = maxGrupo; tamano >= minGrupo; tamano -= paso) {
     final columnas = _columnasPara(tamano, espacio.width, separacion);
+    if (columnas < 1) continue; // no entra ni una vez a lo ancho: probar más chico
     final filas = (grupos / columnas).ceil();
     final alto = filas * tamano + (filas - 1) * separacion;
     if (alto <= espacio.height) {
@@ -40,17 +41,18 @@ MatchLayout calcularLayout({
     }
   }
 
-  // Caso degradado: ni al mínimo entra a lo alto. Se devuelve el mínimo —
-  // con tope 30 (6 grupos) esto no debería ocurrir en pantallas reales.
+  // Caso degradado: el espacio es demasiado bajo, o más angosto que minGrupo.
+  // Se devuelve el mínimo con una columna, garantizando al menos un grupo
+  // visible, aunque pueda desbordar a lo ancho en espacios muy angostos.
   final columnas = _columnasPara(minGrupo, espacio.width, separacion);
+  final columnasFinales = columnas < 1 ? 1 : columnas;
   return MatchLayout(
     tamanoGrupo: minGrupo,
-    columnas: columnas,
-    filas: (grupos / columnas).ceil(),
+    columnas: columnasFinales,
+    filas: (grupos / columnasFinales).ceil(),
   );
 }
 
 int _columnasPara(double tamano, double ancho, double separacion) {
-  final cabe = ((ancho + separacion) / (tamano + separacion)).floor();
-  return cabe < 1 ? 1 : cabe;
+  return ((ancho + separacion) / (tamano + separacion)).floor();
 }
