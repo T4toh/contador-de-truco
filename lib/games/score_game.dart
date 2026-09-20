@@ -49,7 +49,12 @@ class ScoreGame {
     );
     this.tope = tope;
     puntajes = List.filled(participantes, 0);
-    nombres = spec.nombresPorDefecto.take(participantes).toList();
+    // Los nombres que el usuario haya puesto sobreviven a una partida nueva;
+    // solo se completan con los del spec si ahora hay más participantes.
+    nombres = List.generate(
+      participantes,
+      (i) => i < nombres.length ? nombres[i] : spec.nombresPorDefecto[i],
+    );
     empezada = true;
     terminada = false;
     ganador = null;

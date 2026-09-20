@@ -199,36 +199,38 @@ class _CounterScreenState extends State<CounterScreen> {
   }) {
     return SafeArea(
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (titulo != null) ...[
-              Text(titulo, style: Theme.of(context).textTheme.headlineMedium),
-              const SizedBox(height: 28),
-            ],
-            ...opciones.map(
-              (o) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: FilledButton.tonal(
-                  onPressed: () => alElegir(o),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: MesaColors.maderaClara,
-                    foregroundColor: MesaColors.crema,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 64, vertical: 22),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      side: const BorderSide(color: MesaColors.dorado),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (titulo != null) ...[
+                Text(titulo, style: Theme.of(context).textTheme.headlineMedium),
+                const SizedBox(height: 28),
+              ],
+              ...opciones.map(
+                (o) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: FilledButton.tonal(
+                    onPressed: () => alElegir(o),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: MesaColors.maderaClara,
+                      foregroundColor: MesaColors.crema,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 64, vertical: 22),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: const BorderSide(color: MesaColors.dorado),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    etiqueta(o),
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    child: Text(
+                      etiqueta(o),
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
