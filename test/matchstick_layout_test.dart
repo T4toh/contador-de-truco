@@ -80,4 +80,40 @@ void main() {
       }
     }
   });
+
+  test('con gruposPorLinea fijo respeta esa cantidad de columnas', () {
+    // 30 puntos = 6 grupos; con 3 por línea tienen que ser 2 filas.
+    final l = calcularLayout(
+      puntos: 30,
+      espacio: const Size(340, 400),
+      gruposPorLinea: 3,
+    );
+    expect(l.columnas, 3);
+    expect(l.filas, 2);
+    final ancho = l.columnas * l.tamanoGrupo + (l.columnas - 1) * l.separacion;
+    expect(ancho, lessThanOrEqualTo(340));
+  });
+
+  test('una línea llena son 15 puntos en Truco', () {
+    // 15 puntos = 3 grupos = exactamente una línea.
+    final l = calcularLayout(
+      puntos: 15,
+      espacio: const Size(340, 400),
+      gruposPorLinea: 3,
+    );
+    expect(l.columnas, 3);
+    expect(l.filas, 1);
+  });
+
+  test('gruposPorLinea achica el grupo en vez de desbordar a lo ancho', () {
+    // Panel angosto: tres por línea igual, pero más chicos.
+    final l = calcularLayout(
+      puntos: 15,
+      espacio: const Size(180, 400),
+      gruposPorLinea: 3,
+    );
+    expect(l.columnas, 3);
+    final ancho = l.columnas * l.tamanoGrupo + (l.columnas - 1) * l.separacion;
+    expect(ancho, lessThanOrEqualTo(180));
+  });
 }

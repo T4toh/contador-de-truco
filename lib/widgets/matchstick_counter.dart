@@ -10,7 +10,11 @@ import 'matchstick_layout.dart';
 class MatchstickCounter extends StatefulWidget {
   final int points;
 
-  const MatchstickCounter({super.key, required this.points});
+  /// Cuántos grupos van por línea, si el juego lo fija. Si es null, el
+  /// layout acomoda los grupos según el espacio disponible.
+  final int? gruposPorLinea;
+
+  const MatchstickCounter({super.key, required this.points, this.gruposPorLinea});
 
   @override
   State<MatchstickCounter> createState() => _MatchstickCounterState();
@@ -62,6 +66,7 @@ class _MatchstickCounterState extends State<MatchstickCounter>
         final layout = calcularLayout(
           puntos: widget.points,
           espacio: Size(restricciones.maxWidth, restricciones.maxHeight),
+          gruposPorLinea: widget.gruposPorLinea,
         );
 
         final cantidadGrupos = (widget.points / 5).ceil();

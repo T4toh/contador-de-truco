@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:contador_de_truco/games/catalog.dart';
 import 'package:contador_de_truco/games/counter_screen.dart';
 import 'package:contador_de_truco/theme/mesa_theme.dart';
+import 'package:contador_de_truco/widgets/matchstick_counter.dart';
 import 'package:contador_de_truco/widgets/score_panel.dart';
 
 void main() {
@@ -145,5 +146,20 @@ void main() {
 
     expect(find.text('Nombre del equipo'), findsOneWidget);
     expect(find.text('0'), findsNWidgets(2));
+  });
+
+  testWidgets('el panel del Truco agrupa los fósforos de a tres por línea',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(
+      MaterialApp(theme: mesaTheme(), home: CounterScreen(spec: truco)),
+    );
+    await tester.pump();
+    await tester.tap(find.text('A MALAS'));
+    await tester.pump();
+
+    final contador =
+        tester.widget<MatchstickCounter>(find.byType(MatchstickCounter).first);
+    expect(contador.gruposPorLinea, 3);
   });
 }

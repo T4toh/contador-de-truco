@@ -15,6 +15,10 @@ class ScorePanel extends StatelessWidget {
   final VoidCallback? onRestar;
   final VoidCallback onRenombrar;
 
+  /// Cuántos grupos de fósforos van por línea. Se reenvía a
+  /// [MatchstickCounter] tal cual.
+  final int? gruposPorLinea;
+
   const ScorePanel({
     super.key,
     required this.nombre,
@@ -24,6 +28,7 @@ class ScorePanel extends StatelessWidget {
     required this.onSumar,
     required this.onRestar,
     required this.onRenombrar,
+    this.gruposPorLinea,
   });
 
   @override
@@ -78,7 +83,12 @@ class ScorePanel extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 4),
                 child: _Chip(texto: chip!, activo: chipActivo),
               ),
-            Expanded(child: MatchstickCounter(points: puntaje)),
+            Expanded(
+              child: MatchstickCounter(
+                points: puntaje,
+                gruposPorLinea: gruposPorLinea,
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
               child: Row(

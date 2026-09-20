@@ -21,6 +21,13 @@ class GameSpec {
 
   final Hito? hito;
 
+  /// Cuántos grupos de cinco van por línea. En el Truco son 3, porque tres
+  /// grupos son 15 puntos: una línea llena es las malas o las buenas
+  /// completas, y eso se lee de un vistazo sin contar.
+  ///
+  /// Si es null, el layout acomoda los grupos según el espacio disponible.
+  final int? gruposPorLinea;
+
   const GameSpec({
     required this.id,
     required this.titulo,
@@ -30,6 +37,7 @@ class GameSpec {
     this.etiquetasTope,
     required this.nombresPorDefecto,
     this.hito,
+    this.gruposPorLinea,
   });
 
   bool get eligeTope => topes.length > 1;
