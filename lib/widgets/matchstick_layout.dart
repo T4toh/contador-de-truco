@@ -5,11 +5,13 @@ class MatchLayout {
   final double tamanoGrupo;
   final int columnas;
   final int filas;
+  final double separacion;
 
   const MatchLayout({
     required this.tamanoGrupo,
     required this.columnas,
     required this.filas,
+    required this.separacion,
   });
 }
 
@@ -28,7 +30,7 @@ MatchLayout calcularLayout({
 }) {
   final grupos = (puntos / 5).ceil();
   if (grupos <= 0) {
-    return MatchLayout(tamanoGrupo: minGrupo, columnas: 0, filas: 0);
+    return MatchLayout(tamanoGrupo: minGrupo, columnas: 0, filas: 0, separacion: separacion);
   }
 
   for (var tamano = maxGrupo; tamano >= minGrupo; tamano -= paso) {
@@ -37,7 +39,7 @@ MatchLayout calcularLayout({
     final filas = (grupos / columnas).ceil();
     final alto = filas * tamano + (filas - 1) * separacion;
     if (alto <= espacio.height) {
-      return MatchLayout(tamanoGrupo: tamano, columnas: columnas, filas: filas);
+      return MatchLayout(tamanoGrupo: tamano, columnas: columnas, filas: filas, separacion: separacion);
     }
   }
 
@@ -50,6 +52,7 @@ MatchLayout calcularLayout({
     tamanoGrupo: minGrupo,
     columnas: columnasFinales,
     filas: (grupos / columnasFinales).ceil(),
+    separacion: separacion,
   );
 }
 

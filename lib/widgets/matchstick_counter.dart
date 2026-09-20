@@ -53,8 +53,8 @@ class MatchstickCounter extends StatelessWidget {
           child: Wrap(
             alignment: WrapAlignment.center,
             runAlignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
+            spacing: layout.separacion,
+            runSpacing: layout.separacion,
             children: grupos,
           ),
         );
@@ -106,7 +106,7 @@ class MatchstickGroupPainter extends CustomPainter {
 
     final dx = hasta.dx - desde.dx;
     final dy = hasta.dy - desde.dy;
-    // ±2.5° de inclinación y ±3% de largo, por fósforo.
+    // ±2.6° de inclinación y ±3% de largo, por fósforo.
     final angulo = math.atan2(dy, dx) + _ruido(i, 0) * 0.045;
     final largo = math.sqrt(dx * dx + dy * dy) * (1 + _ruido(i, 1) * 0.03);
 
