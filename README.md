@@ -52,8 +52,9 @@ Los puntos se dibujan como **fósforos**, igual que anotando en un papel: cada g
 cuadrado de 4 fósforos más la diagonal. Está hecho con `CustomPainter` — no hay imágenes en el
 proyecto.
 
-El resto de la interfaz usa **Material 3** con esquema de color generado a partir de un verde (mesa
-de juego), tipografía **Raleway** vía `google_fonts`, y sigue el tema claro/oscuro del sistema.
+El resto de la interfaz sigue el tema "paño y madera": fondo verde de mesa de juego y paneles de
+madera, con tipografía **Alegreya** vía `google_fonts`. Es un único tema oscuro fijo — no sigue el
+modo claro/oscuro del sistema.
 
 ---
 
@@ -63,8 +64,9 @@ La partida en curso se guarda sola con `shared_preferences` después de cada cam
 nombres, modo de juego y si hay partida empezada. Si cerrás la app en la mitad de una partida, al
 volver seguís donde estabas.
 
-Las claves están prefijadas por juego (`truco_*`, `escoba_*`). El código de Truco incluye una
-migración de claves viejas sin prefijo, de cuando la app tenía un solo juego.
+Las claves están prefijadas por juego (`truco_*`, `escoba_*`). `GameStorage` migra los esquemas
+viejos (claves sin prefijo de cuando la app tenía un solo juego, y versiones anteriores por juego)
+una sola vez al arrancar, antes de que exista cualquier pantalla.
 
 ---
 
@@ -97,18 +99,35 @@ flutter test         # tests de widget
 
 ```
 lib/
-├── main.dart                        # tema, navegación por tabs
-├── truco/truco_counter.dart         # juego completo: estado + persistencia + UI
-├── escoba/escoba_counter.dart       # ídem
+├── main.dart                        # arranque, migración, navegación por tabs
+├── theme/
+│   ├── mesa_colors.dart             # paleta paño/madera
+│   └── mesa_theme.dart              # ThemeData único (oscuro fijo)
+├── games/
+│   ├── game_spec.dart               # descripción de un juego como dato
+│   ├── score_game.dart              # estado y reglas, sin widgets
+│   ├── game_storage.dart            # persistencia + migración de esquemas viejos
+│   ├── counter_screen.dart          # pantalla única que renderiza cualquier GameSpec
+│   ├── panel_layout.dart            # cómo se acomodan los paneles según orientación/cantidad
+│   └── catalog.dart                 # los juegos: Truco y Escoba del 15
 └── widgets/
+    ├── felt_background.dart         # fondo de paño
+    ├── wood_panel.dart              # panel de madera
+    ├── score_panel.dart             # panel de puntaje de un equipo/jugador
+    ├── game_header.dart             # header con reset
+    ├── name_dialog.dart             # diálogo para renombrar
     ├── matchstick_counter.dart      # los fósforos (CustomPainter)
+    ├── matchstick_layout.dart       # cálculo de columnas/tamaño de los fósforos
     └── winner_bottom_sheet.dart     # pantalla de ganador
 docs/                                # reglas de cada juego (no docs de código)
 ```
 
-Cada juego es un archivo autocontenido con su propio estado (`setState`, sin librería de state
-management) y su propia persistencia. La navegación usa `IndexedStack`, así que cambiar de tab no
-pierde la partida del otro juego.
+Un juego ya no es un archivo autocontenido: es una entrada (`GameSpec`) en `catalog.dart` — id,
+título, ícono, participantes posibles, topes y nombres por defecto. `CounterScreen` es la única
+pantalla y renderiza cualquier `GameSpec`; agregar un juego nuevo no toca la UI. El estado y las
+reglas viven en `ScoreGame` (sin dependencia de widgets, se testea directo) y la persistencia en
+`GameStorage`, con claves prefijadas por `spec.id`. La navegación usa `IndexedStack`, así que cambiar
+de tab no pierde la partida del otro juego.
 
 ---
 
@@ -120,12 +139,6 @@ pierde la partida del otro juego.
   cambiarlo antes de publicar en Play Store.
 - **Tests**: los que hay son de humo (que la app renderice y navegue). Falta cubrir la lógica de
   puntaje: el tope, el piso en 0, el umbral de las buenas y la detección de ganador.
-- **Duplicación**: los dos contadores repiten el diálogo de nombre, el header con reset y el gradiente
-  de fondo. Vale unificarlos cuando entre un tercer juego.
-- **Layout de los fósforos**: es la parte más frágil. Varios commits seguidos fueron arreglos de
-  clipping cuando el panel queda chico (pocos píxeles de alto, muchos puntos). Hoy se resuelve con
-  `FittedBox`. Probar siempre con puntajes altos y en horizontal antes de dar por buena una
-  modificación ahí.
 
 ---
 

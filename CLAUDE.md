@@ -14,6 +14,10 @@ flutter test test/widget_test.dart --plain-name 'Truco tab shows game mode selec
 ./install_apk.sh                     # adb uninstall + install del APK release
 ```
 
+Sin Android SDK ni Chrome disponibles, la verificación visual se hace con
+`flutter run -d web-server --web-port=8080` y Firefox; redimensionar la ventana simula tablet y
+horizontal.
+
 `applicationId` sigue siendo `com.example.contador_de_truco` (default del template).
 
 ## Arquitectura
@@ -21,52 +25,76 @@ flutter test test/widget_test.dart --plain-name 'Truco tab shows game mode selec
 App Flutter de contadores de puntaje para juegos de cartas argentinos. Sin backend, sin state
 management externo, sin assets: todo `StatefulWidget` + `setState` + `CustomPainter`.
 
-**Shell** — `lib/main.dart`: `ContadorDeTrucoApp` (tema Material 3 seed verde, light/dark por sistema,
-`GoogleFonts.ralewayTextTheme`) → `HomeScreen` con `NavigationBar` + `IndexedStack`. El `IndexedStack`
-es intencional: mantiene vivo el estado de cada juego al cambiar de tab. Agregar un juego = agregar su
-widget a `_pages` y un `NavigationDestination`.
+**Shell** — `lib/main.dart`: `main()` corre la migración de `GameStorage` una sola vez, antes de
+`runApp`, envuelta en `try/catch` (si falla, se pierde la partida vieja pero la app abre igual —
+nunca dejar que un fallo de migración tire una pantalla en blanco). Después, `ContadorDeTrucoApp`
+(tema único vía `mesaTheme()`) → `HomeScreen` con `NavigationBar` + `IndexedStack`. El `IndexedStack`
+es intencional: mantiene vivo el estado de cada juego al cambiar de tab.
 
-**Un juego = un archivo autocontenido** (`lib/truco/truco_counter.dart`, `lib/escoba/escoba_counter.dart`).
-Cada uno posee su estado, su persistencia y sus vistas. No hay capa de repositorio ni modelos
-compartidos; la duplicación entre los dos counters (diálogo de nombre, header con reset, gradiente,
-`_showWinnerDialog`) es deliberada por ahora.
+**Un juego = una entrada de `lib/games/catalog.dart`**, no un archivo ni una pantalla. `GameSpec`
+(`lib/games/game_spec.dart`) es puro dato: id (también prefijo de persistencia), título, ícono,
+participantes posibles, topes posibles, nombres por defecto y un `Hito` opcional (el "pasa a las
+buenas"). Agregar un juego es agregar una `const GameSpec` al catálogo — no hay UI que tocar.
 
-**Ciclo de vida compartido por cada counter**: `_gameStarted == false` → `_buildSetupView` (elegir modo
-o cantidad de jugadores) → `_startNewGame` → vista de partida (`OrientationBuilder`, portrait = Column /
-landscape = Row) → al llegar al máximo `_gameFinished = true` + `WinnerBottomSheet` no dismissible →
-"Nueva Partida" vuelve al setup.
+**`CounterScreen`** (`lib/games/counter_screen.dart`) es la única pantalla, para cualquier juego:
+recibe un `GameSpec` y decide solo qué preguntar en el setup (tope si `spec.eligeTope`, cantidad de
+participantes si `spec.eligeParticipantes`) y cómo se acomodan los paneles (`panel_layout.dart`,
+según orientación y cantidad). Ciclo de vida: `_juego.empezada == false` → setup → `_empezar` → vista
+de partida (`GameHeader` + tablero) → al llegar al tope, `terminada = true` + `WinnerBottomSheet` no
+dismissible → "Nueva partida" vuelve al setup.
 
-**Persistencia** — `SharedPreferences`, claves planas con prefijo por juego: `truco_*`, `escoba_*`
-(los scores/nombres de escoba son `escoba_score_$i` / `escoba_name_$i`, indexados por jugador).
-`_saveGame()` se llama después de cada mutación. `_loadGame()` en truco tiene un bloque de migración
-de claves viejas sin prefijo (`scoreA`, `gameStarted`, …); no romperlo al editar.
+**`ScoreGame`** (`lib/games/score_game.dart`) tiene el estado y las reglas — sumar con `.clamp(0,
+tope)`, detectar ganador, el hito de las buenas — sin ninguna dependencia de widgets. Por eso se
+testea directo, sin `WidgetTester`. Lo posee el `State` de `CounterScreen`, que envuelve cada mutación
+en `setState`.
+
+**`GameStorage`** (`lib/games/game_storage.dart`) es dueña de la persistencia: `SharedPreferences` con
+claves `<id>_tope`, `<id>_empezada`, `<id>_participantes`, `<id>_score_$i`, `<id>_name_$i`. También
+migra los tres esquemas históricos (claves sin prefijo de cuando la app tenía un solo juego, y las
+versiones v1 de Truco y Escoba) de forma idempotente, guardando `schema_version`. Esta migración corre
+**una sola vez desde `main()`**, deliberadamente: correrla por pantalla (una por `CounterScreen`
+montado) las hacía correr en paralelo y podían pisarse entre sí.
+
+**Layout de los fósforos** — `calcularLayout` en `lib/widgets/matchstick_layout.dart` mide el espacio
+disponible (`Size`) y elige el tamaño de grupo más grande que entra sin desbordar, iterando de
+`maxGrupo` a `minGrupo`. Ya no hay `FittedBox` estirando el dibujo: por eso en tablet aparecen más
+fósforos del mismo tamaño real en vez de fósforos gigantes, y por eso se arregló el clipping crónico
+de versiones anteriores. **No reintroducir un `FittedBox` u otro estirado a llenar el espacio** —
+volvería a producir el mismo bug de clipping.
 
 **Widgets compartidos** (`lib/widgets/`):
-- `MatchstickCounter` — dibuja el puntaje como fósforos: grupos de 5 (`MatchstickGroupPainter` pinta
-  4 lados de un cuadrado + diagonal), `groupsPerRow` controla el wrap, `FittedBox` evita clipping
-  cuando el panel es chico. Es el punto sensible de layout del repo: varios commits recientes son
-  fixes de clipping acá.
+- `FeltBackground` / `WoodPanel` — fondo de paño y panel de madera, la base visual del tema.
+- `ScorePanel` — panel de un equipo/jugador: nombre, puntaje, chip de hito, botones +/-.
+- `GameHeader` — título de la partida + botón de reinicio.
+- `NameDialog` — diálogo para renombrar.
+- `MatchstickCounter` — dibuja el puntaje como fósforos (`CustomPainter`): grupos de 5, 4 lados de un
+  cuadrado más la diagonal.
 - `WinnerBottomSheet` — pantalla de ganador, recibe `onReset`.
 
 ## Reglas de juego codificadas
 
-- **Truco**: "A MALAS" = partida a 15, "A BUENAS" = a 30. Con `_maxScore == 30`, `score >= 15` es
-  *en las buenas*: cambia el color del panel y dispara una `ScaleTransition` (elastic, 500ms) una sola
-  vez al cruzar el umbral. Dos equipos con nombre editable (default `Nosotros` / `Ellos`).
-- **Escoba del 15**: máximo fijo 15, 2–4 jugadores. Con 4 jugadores siempre grid 2x2 sin importar la
-  orientación; con 2 o 3 depende de la orientación.
-- Los puntajes se hacen `.clamp(0, maxScore)`, así que restar nunca va a negativo.
+- **Truco** (`catalog.dart`): tope 15 ("A MALAS") o 30 ("A BUENAS"), 2 participantes fijos. Con tope
+  30, el `Hito` dispara en 15: cambia el aspecto del panel y el chip pasa de `EN LAS MALAS` a
+  `EN LAS BUENAS` (`ScoreGame.cruzoElHito`). Nombres por defecto `Nosotros` / `Ellos`.
+- **Escoba del 15**: tope fijo 15, 2 a 4 participantes. Con 4, `panel_layout.dart` siempre arma grilla
+  2x2 sin importar la orientación; con 2 o 3 depende de la orientación (`layoutFor`).
+- Los puntajes se hacen `.clamp(0, tope)` en `ScoreGame.sumar`, así que restar nunca va a negativo ni
+  sumar pasa del tope.
 
 ## Convenciones de UI
 
 - Interacción: **tap** en el panel = +1, **long-press** sobre el nombre = renombrar, botón `-` = -1
-  (deshabilitado con `_gameFinished`). El README describe controles viejos (+1/+2/+3, tap para
-  renombrar) — el código manda.
+  (deshabilitado cuando `_juego.terminada`).
 - Todo el texto de la UI está en español rioplatense ("Ingresá el nombre", "¿Reiniciar partida?").
-- Colores siempre desde `Theme.of(context).colorScheme` (funciona en light y dark). Las únicas
-  excepciones son los `Paint` de los fósforos (`Colors.brown[400]`, `Colors.redAccent[700]`).
-- Tipografía siempre `GoogleFonts.raleway(...)` explícito en cada `Text` con estilo propio.
-- Los `AlertDialog` usan `RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))`.
+- Colores: fuera de un `CustomPainter`, siempre una constante de `MesaColors` (nunca
+  `Theme.of(context).colorScheme` ni `Colors.*` directo) — ver `lib/theme/mesa_colors.dart`. Dentro de
+  un `CustomPainter` (los fósforos), el sombreado procedural queda literal (`Colors.white.withValues`,
+  gradientes con `Color(0x...)` puntuales) porque ahí se está simulando luz, no pintando UI.
+- Tipografía: `mesaTheme()` define un único `textTheme` (Alegreya / Alegreya Sans vía `google_fonts`)
+  y el resto del código usa `Theme.of(context).textTheme.<estilo>` — no hay `GoogleFonts.alegreya(...)`
+  explícito repartido por los widgets.
+- Los diálogos usan `RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))` (vía
+  `dialogTheme` en `mesaTheme()`).
 
 ## docs/
 
