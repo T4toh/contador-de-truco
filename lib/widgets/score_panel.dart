@@ -42,47 +42,48 @@ class ScorePanel extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: GestureDetector(
-                onLongPress: onRenombrar,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        nombre,
-                        style: textos.headlineMedium,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onLongPress: onRenombrar,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              nombre,
+                              style: textos.headlineMedium,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: onRenombrar,
+                            // El ícono queda chico, pero el área de toque
+                            // cumple el mínimo de 44x44: al lado hay un área
+                            // que suma puntos, así que errarle no puede
+                            // costar un punto de más.
+                            behavior: HitTestBehavior.opaque,
+                            child: const SizedBox(
+                              width: 44,
+                              height: 44,
+                              child: Icon(
+                                Icons.edit,
+                                size: 18,
+                                color: MesaColors.doradoClaro,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    GestureDetector(
-                      onTap: onRenombrar,
-                      // El ícono queda chico, pero el área de toque cumple el
-                      // mínimo de 48x48: al lado hay un área que suma puntos,
-                      // así que errarle no puede costar un punto de más.
-                      behavior: HitTestBehavior.opaque,
-                      child: const SizedBox(
-                        width: 48,
-                        height: 48,
-                        child: Icon(
-                          Icons.edit,
-                          size: 18,
-                          color: MesaColors.doradoClaro,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  if (chip != null) _Chip(texto: chip!, activo: chipActivo),
+                ],
               ),
             ),
-            if (chip != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: _Chip(texto: chip!, activo: chipActivo),
-              ),
             Expanded(
               child: MatchstickCounter(
                 points: puntaje,

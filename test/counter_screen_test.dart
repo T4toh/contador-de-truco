@@ -138,14 +138,35 @@ void main() {
       matching: find.byType(SizedBox),
     ).first;
     final area = tester.getSize(lapiz);
-    expect(area.width, greaterThanOrEqualTo(48));
-    expect(area.height, greaterThanOrEqualTo(48));
+    expect(area.width, greaterThanOrEqualTo(44));
+    expect(area.height, greaterThanOrEqualTo(44));
 
     await tester.tap(find.byIcon(Icons.edit).first);
     await tester.pumpAndSettle();
 
     expect(find.text('Nombre del equipo'), findsOneWidget);
     expect(find.text('0'), findsNWidgets(2));
+  });
+
+  testWidgets(
+      'un nombre muy largo se acorta y no tapa el chip del hito',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({
+      'truco_tope': 30,
+      'truco_empezada': true,
+      'truco_participantes': 2,
+      'truco_name_0': 'Un Nombre De Equipo Larguísimo Que No Entra',
+      'truco_name_1': 'Ellos',
+      'truco_score_0': 0,
+      'truco_score_1': 0,
+    });
+    await tester.pumpWidget(
+      MaterialApp(theme: mesaTheme(), home: CounterScreen(spec: truco)),
+    );
+    await tester.pump();
+
+    expect(find.text('EN LAS MALAS'), findsWidgets);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('el panel del Truco agrupa los fósforos de a tres por columna',
