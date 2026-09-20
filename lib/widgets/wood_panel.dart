@@ -58,7 +58,7 @@ class _WoodPanelState extends State<WoodPanel>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: widget.destacado
-                ? const [Color(0xFF8E5E34), MesaColors.maderaClara]
+                ? const [MesaColors.maderaDestacada, MesaColors.maderaClara]
                 : const [MesaColors.maderaClara, MesaColors.maderaOscura],
           ),
           borderRadius: BorderRadius.circular(12),
@@ -68,7 +68,7 @@ class _WoodPanelState extends State<WoodPanel>
           ),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x73000000),
+              color: MesaColors.sombraPanel,
               blurRadius: 16,
               offset: Offset(0, 6),
             ),

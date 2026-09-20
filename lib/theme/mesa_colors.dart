@@ -27,4 +27,13 @@ abstract final class MesaColors {
 
   /// Palito del fósforo.
   static const maderaFosforo = Color(0xFFDCC294);
+
+  /// Madera del panel cuando cruza el hito.
+  static const maderaDestacada = Color(0xFF8E5E34);
+
+  /// Sombra proyectada de los paneles sobre el paño.
+  static const sombraPanel = Color(0x73000000);
+
+  /// Fondo del chip cuando el hito todavía no se cruzó.
+  static const chipInactivo = Color(0x40000000);
 }

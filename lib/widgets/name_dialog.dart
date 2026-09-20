@@ -31,5 +31,8 @@ Future<String?> mostrarNameDialog(
         ),
       ],
     ),
-  );
+  ).then((resultado) {
+    controller.dispose();
+    return resultado;
+  });
 }

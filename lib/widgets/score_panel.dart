@@ -91,7 +91,7 @@ class _Chip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: activo ? MesaColors.dorado : Colors.black.withValues(alpha: .25),
+        color: activo ? MesaColors.dorado : MesaColors.chipInactivo,
         borderRadius: BorderRadius.circular(99),
         border: Border.all(color: MesaColors.dorado, width: 1),
       ),
