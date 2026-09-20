@@ -137,9 +137,22 @@ de tab no pierde la partida del otro juego.
   no encaja en el patrón "contador de puntos" de los otros dos juegos.
 - **`applicationId`**: sigue siendo `com.example.contador_de_truco`, el default del template. Hay que
   cambiarlo antes de publicar en Play Store.
-- **Tests**: la lógica de puntaje (el tope, el piso en 0, el umbral de las buenas y la detección de
-  ganador) ya está cubierta en `test/score_game_test.dart`. Falta un test que ejercite la pantalla
-  de juego en sí: tocar, restar, renombrar y la planilla de ganador.
+- **Actualizar desde adentro de la app**: hoy la única forma de instalar una versión nueva es
+  compilar el APK y pasarlo por USB. Hay que buscar cómo hacerlo desde la app misma. Tres caminos,
+  de menor a mayor compromiso:
+  - **Chequear releases de GitHub**: la app consulta la API de releases del repo, compara contra su
+    propia versión y, si hay una nueva, ofrece descargar el APK. Sin dependencias de tiendas, pero
+    requiere el permiso de instalar de orígenes desconocidos y que el usuario acepte cada vez.
+  - **Play Store**: publicar la app y dejar que la tienda resuelva las actualizaciones sola. Es lo
+    más cómodo para quien la usa, pero implica cuenta de desarrollador, revisión, y cambiar el
+    `applicationId` antes (ver el punto de arriba).
+  - **Shorebird** u otro sistema de *code push*: actualiza el código Dart sin reinstalar el APK.
+    Muy cómodo para arreglos chicos, pero no sirve para cambios que tocan código nativo o
+    dependencias, y suma un servicio externo del que la app pasa a depender.
+
+- **Tests**: falta cubrir la planilla de ganador y el ida y vuelta completo de persistencia a través
+  de la UI. Lo demás está: la lógica de puntaje en `test/score_game_test.dart`, las migraciones en
+  `test/game_storage_test.dart`, y tocar, restar y renombrar en `test/counter_screen_test.dart`.
 
 ---
 
