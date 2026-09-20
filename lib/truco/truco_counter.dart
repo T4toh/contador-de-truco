@@ -34,7 +34,7 @@ class _TrucoCounterState extends State<TrucoCounter>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.04).animate(
       CurvedAnimation(
           parent: _animationController, curve: Curves.elasticOut),
     );

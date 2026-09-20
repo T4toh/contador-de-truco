@@ -7,14 +7,41 @@ import 'matchstick_layout.dart';
 
 /// Dibuja el puntaje como fósforos: grupos de 5 (cuatro lados de un
 /// cuadrado más la diagonal), igual que anotando en un papel.
-class MatchstickCounter extends StatelessWidget {
+class MatchstickCounter extends StatefulWidget {
   final int points;
 
   const MatchstickCounter({super.key, required this.points});
 
   @override
+  State<MatchstickCounter> createState() => _MatchstickCounterState();
+}
+
+class _MatchstickCounterState extends State<MatchstickCounter>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _caida = AnimationController(
+    duration: const Duration(milliseconds: 200),
+    vsync: this,
+    value: 1,
+  );
+
+  @override
+  void didUpdateWidget(MatchstickCounter anterior) {
+    super.didUpdateWidget(anterior);
+    // Solo al sumar. Al restar o reiniciar, el dibujo cambia sin animación.
+    if (widget.points > anterior.points) {
+      _caida.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _caida.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (points <= 0) {
+    if (widget.points <= 0) {
       return Center(
         child: Text(
           '—',
@@ -29,34 +56,47 @@ class MatchstickCounter extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, restricciones) {
         final layout = calcularLayout(
-          puntos: points,
+          puntos: widget.points,
           espacio: Size(restricciones.maxWidth, restricciones.maxHeight),
         );
 
-        final grupos = <Widget>[];
-        var restantes = points;
-        var indice = 0;
-        while (restantes > 0) {
-          final enEste = restantes >= 5 ? 5 : restantes;
-          grupos.add(SizedBox(
-            width: layout.tamanoGrupo,
-            height: layout.tamanoGrupo,
-            child: CustomPaint(
-              painter: MatchstickGroupPainter(count: enEste, semilla: indice),
-            ),
-          ));
-          restantes -= enEste;
-          indice++;
-        }
+        final cantidadGrupos = (widget.points / 5).ceil();
 
-        return Center(
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            runAlignment: WrapAlignment.center,
-            spacing: layout.separacion,
-            runSpacing: layout.separacion,
-            children: grupos,
-          ),
+        return AnimatedBuilder(
+          animation: _caida,
+          builder: (context, _) {
+            final progreso = Curves.easeOut.transform(_caida.value);
+            final grupos = <Widget>[];
+            var restantes = widget.points;
+            var indice = 0;
+            while (restantes > 0) {
+              final enEste = restantes >= 5 ? 5 : restantes;
+              grupos.add(SizedBox(
+                width: layout.tamanoGrupo,
+                height: layout.tamanoGrupo,
+                child: CustomPaint(
+                  painter: MatchstickGroupPainter(
+                    count: enEste,
+                    semilla: indice,
+                    animarUltimo: indice == cantidadGrupos - 1,
+                    progreso: progreso,
+                  ),
+                ),
+              ));
+              restantes -= enEste;
+              indice++;
+            }
+
+            return Center(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                runAlignment: WrapAlignment.center,
+                spacing: layout.separacion,
+                runSpacing: layout.separacion,
+                children: grupos,
+              ),
+            );
+          },
         );
       },
     );
@@ -71,7 +111,15 @@ class MatchstickGroupPainter extends CustomPainter {
   /// no parezcan clonados — y es determinística, así que no titila.
   final int semilla;
 
-  const MatchstickGroupPainter({required this.count, required this.semilla});
+  final bool animarUltimo;
+  final double progreso;
+
+  const MatchstickGroupPainter({
+    required this.count,
+    required this.semilla,
+    this.animarUltimo = false,
+    this.progreso = 1,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -95,7 +143,19 @@ class MatchstickGroupPainter extends CustomPainter {
     ];
 
     for (var i = 0; i < count && i < trazos.length; i++) {
-      _fosforo(canvas, trazos[i][0], trazos[i][1], size, i);
+      final esElNuevo = animarUltimo && i == count - 1;
+      if (esElNuevo && progreso < 1) {
+        // Cae desde un poco más arriba, apareciendo.
+        canvas.saveLayer(
+          Offset.zero & size,
+          Paint()..color = Colors.white.withValues(alpha: progreso),
+        );
+        canvas.translate(0, -(1 - progreso) * size.shortestSide * 0.18);
+        _fosforo(canvas, trazos[i][0], trazos[i][1], size, i);
+        canvas.restore();
+      } else {
+        _fosforo(canvas, trazos[i][0], trazos[i][1], size, i);
+      }
     }
   }
 
@@ -182,5 +242,8 @@ class MatchstickGroupPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant MatchstickGroupPainter anterior) =>
-      anterior.count != count || anterior.semilla != semilla;
+      anterior.count != count ||
+      anterior.semilla != semilla ||
+      anterior.animarUltimo != animarUltimo ||
+      anterior.progreso != progreso;
 }
