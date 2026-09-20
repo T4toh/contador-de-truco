@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'truco/truco_counter.dart';
 import 'escoba/escoba_counter.dart';
+import 'theme/mesa_theme.dart';
 
 void main() {
   runApp(const ContadorDeTrucoApp());
@@ -15,23 +15,7 @@ class ContadorDeTrucoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Contador de Truco',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-        textTheme: GoogleFonts.ralewayTextTheme(),
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.green,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-        textTheme: GoogleFonts.ralewayTextTheme(ThemeData.dark().textTheme),
-      ),
-      themeMode: ThemeMode.system,
+      theme: mesaTheme(),
       home: const HomeScreen(),
     );
   }
