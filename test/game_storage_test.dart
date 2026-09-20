@@ -1,33 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:contador_de_truco/games/game_spec.dart';
+import 'package:contador_de_truco/games/catalog.dart';
 import 'package:contador_de_truco/games/game_storage.dart';
-
-const specTruco = GameSpec(
-  id: 'truco',
-  titulo: 'Truco',
-  icono: Icons.style,
-  participantes: [2],
-  topes: [15, 30],
-  etiquetasTope: {15: 'A MALAS', 30: 'A BUENAS'},
-  nombresPorDefecto: ['Nosotros', 'Ellos'],
-  hito: Hito(
-    en: 15,
-    soloSiTope: 30,
-    antes: 'EN LAS MALAS',
-    despues: 'EN LAS BUENAS',
-  ),
-);
-
-const specEscoba = GameSpec(
-  id: 'escoba',
-  titulo: 'Escoba del 15',
-  icono: Icons.grid_view,
-  participantes: [2, 3, 4],
-  topes: [15],
-  nombresPorDefecto: ['Jugador 1', 'Jugador 2', 'Jugador 3', 'Jugador 4'],
-);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +18,7 @@ void main() {
 
     final storage = GameStorage();
     await storage.migrar();
-    final g = await storage.cargar(specTruco);
+    final g = await storage.cargar(truco);
 
     expect(g.puntajes, [7, 22]);
     expect(g.nombres, ['Los Pibes', 'Ellos']);
@@ -66,7 +40,7 @@ void main() {
 
     final storage = GameStorage();
     await storage.migrar();
-    final g = await storage.cargar(specEscoba);
+    final g = await storage.cargar(escoba);
 
     expect(g.puntajes, [4, 11, 0]);
     expect(g.nombres[0], 'Tato');
@@ -86,7 +60,7 @@ void main() {
 
     final storage = GameStorage();
     await storage.migrar();
-    final g = await storage.cargar(specTruco);
+    final g = await storage.cargar(truco);
 
     expect(g.puntajes, [3, 9]);
     expect(g.nombres[1], 'Los Otros');
@@ -98,7 +72,7 @@ void main() {
 
     final storage = GameStorage();
     await storage.migrar();
-    final g = await storage.cargar(specTruco);
+    final g = await storage.cargar(truco);
 
     expect(g.empezada, isFalse);
     expect(g.puntajes, [0, 0]);
@@ -109,13 +83,13 @@ void main() {
     SharedPreferences.setMockInitialValues({});
 
     final storage = GameStorage();
-    final g = await storage.cargar(specEscoba);
+    final g = await storage.cargar(escoba);
     g.empezar(tope: 15, participantes: 4);
     g.renombrar(2, 'Colo');
     g.sumar(2, 6);
     await storage.guardar(g);
 
-    final leido = await storage.cargar(specEscoba);
+    final leido = await storage.cargar(escoba);
     expect(leido.puntajes, [0, 0, 6, 0]);
     expect(leido.nombres[2], 'Colo');
     expect(leido.empezada, isTrue);
@@ -134,12 +108,12 @@ void main() {
     final storage = GameStorage();
     await storage.migrar();
 
-    final g = await storage.cargar(specTruco);
+    final g = await storage.cargar(truco);
     g.sumar(0, 3); // queda en 8
     await storage.guardar(g);
 
     await storage.migrar(); // no debe pisar con el valor viejo
-    final otra = await storage.cargar(specTruco);
+    final otra = await storage.cargar(truco);
     expect(otra.puntajes[0], 8);
   });
 
@@ -152,7 +126,7 @@ void main() {
 
     final storage = GameStorage();
     await storage.migrar();
-    final g = await storage.cargar(specTruco);
+    final g = await storage.cargar(truco);
 
     expect(g.puntajes, [5, 0]);
     expect(g.nombres, ['Nosotros', 'Ellos']);
@@ -169,7 +143,7 @@ void main() {
 
     final storage = GameStorage();
     await storage.migrar();
-    final g = await storage.cargar(specEscoba);
+    final g = await storage.cargar(escoba);
 
     expect(g.participantes, 2);
     expect(g.puntajes, [3, 0]);
@@ -187,7 +161,7 @@ void main() {
     });
 
     final storage = GameStorage();
-    final g = await storage.cargar(specEscoba);
+    final g = await storage.cargar(escoba);
 
     expect(g.participantes, lessThanOrEqualTo(4));
     expect(g.puntajes.length, g.nombres.length);
