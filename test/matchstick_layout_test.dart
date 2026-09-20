@@ -38,9 +38,14 @@ void main() {
       for (final alto in [60.0, 120.0, 220.0, 400.0, 768.0]) {
         for (final puntos in [1, 5, 8, 15, 23, 30]) {
           final l = calcularLayout(puntos: puntos, espacio: Size(ancho, alto));
-          expect(l.tamanoGrupo, inInclusiveRange(44, 96),
+          expect(l.tamanoGrupo, inInclusiveRange(20, 96),
               reason: 'ancho=$ancho alto=$alto puntos=$puntos');
           expect(l.columnas, greaterThanOrEqualTo(1));
+
+          final altoOcupado = l.filas * l.tamanoGrupo + (l.filas - 1) * 8;
+          expect(altoOcupado, lessThanOrEqualTo(alto),
+              reason:
+                  'los fósforos no deben pintar fuera del panel: ancho=$ancho alto=$alto puntos=$puntos');
         }
       }
     }

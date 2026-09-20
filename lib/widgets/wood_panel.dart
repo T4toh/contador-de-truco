@@ -53,6 +53,7 @@ class _WoodPanelState extends State<WoodPanel>
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 400),
         margin: widget.margin,
+        clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
