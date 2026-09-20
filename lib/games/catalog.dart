@@ -16,7 +16,7 @@ const truco = GameSpec(
     antes: 'EN LAS MALAS',
     despues: 'EN LAS BUENAS',
   ),
-  gruposPorLinea: 3,
+  gruposPorColumna: 3,
 );
 
 const escoba = GameSpec(

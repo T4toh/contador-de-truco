@@ -10,11 +10,11 @@ import 'matchstick_layout.dart';
 class MatchstickCounter extends StatefulWidget {
   final int points;
 
-  /// Cuántos grupos van por línea, si el juego lo fija. Si es null, el
-  /// layout acomoda los grupos según el espacio disponible.
-  final int? gruposPorLinea;
+  /// Cuántos grupos se apilan en cada columna, si el juego lo fija. Si es
+  /// null, el layout acomoda los grupos según el espacio disponible.
+  final int? gruposPorColumna;
 
-  const MatchstickCounter({super.key, required this.points, this.gruposPorLinea});
+  const MatchstickCounter({super.key, required this.points, this.gruposPorColumna});
 
   @override
   State<MatchstickCounter> createState() => _MatchstickCounterState();
@@ -66,7 +66,7 @@ class _MatchstickCounterState extends State<MatchstickCounter>
         final layout = calcularLayout(
           puntos: widget.points,
           espacio: Size(restricciones.maxWidth, restricciones.maxHeight),
-          gruposPorLinea: widget.gruposPorLinea,
+          gruposPorColumna: widget.gruposPorColumna,
         );
 
         final cantidadGrupos = (widget.points / 5).ceil();
@@ -96,13 +96,35 @@ class _MatchstickCounterState extends State<MatchstickCounter>
               indice++;
             }
 
+            // Se arma columna por columna: los primeros `layout.filas` grupos
+            // van en la primera columna, y así. En el Truco eso hace que cada
+            // columna llena sean 15 puntos.
+            final columnas = <Widget>[];
+            for (var c = 0; c < layout.columnas; c++) {
+              final deLaColumna = <Widget>[];
+              for (var f = 0; f < layout.filas; f++) {
+                final indice = c * layout.filas + f;
+                if (indice >= grupos.length) break;
+                if (f > 0) {
+                  deLaColumna.add(SizedBox(height: layout.separacion));
+                }
+                deLaColumna.add(grupos[indice]);
+              }
+              if (deLaColumna.isEmpty) continue;
+              if (columnas.isNotEmpty) {
+                columnas.add(SizedBox(width: layout.separacion));
+              }
+              columnas.add(Column(
+                mainAxisSize: MainAxisSize.min,
+                children: deLaColumna,
+              ));
+            }
+
             return Center(
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                runAlignment: WrapAlignment.center,
-                spacing: layout.separacion,
-                runSpacing: layout.separacion,
-                children: grupos,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: columnas,
               ),
             );
           },

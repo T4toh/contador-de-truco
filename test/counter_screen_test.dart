@@ -148,7 +148,7 @@ void main() {
     expect(find.text('0'), findsNWidgets(2));
   });
 
-  testWidgets('el panel del Truco agrupa los fósforos de a tres por línea',
+  testWidgets('el panel del Truco agrupa los fósforos de a tres por columna',
       (tester) async {
     SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(
@@ -160,6 +160,48 @@ void main() {
 
     final contador =
         tester.widget<MatchstickCounter>(find.byType(MatchstickCounter).first);
-    expect(contador.gruposPorLinea, 3);
+    expect(contador.gruposPorColumna, 3);
+  });
+
+  testWidgets(
+      'a 30 puntos el Truco dibuja dos columnas de tres, no cuatro por línea',
+      (tester) async {
+    // 28 puntos = ceil(28/5) = 6 grupos, igual que a 30, pero sin quedar en
+    // el tope (una partida en el tope ya está terminada y muestra la
+    // planilla de ganador en vez del panel). Sembramos 28 directo por
+    // SharedPreferences: llegar ahí a fuerza de taps sería mucho más lento
+    // y no aporta nada a lo que el test verifica.
+    SharedPreferences.setMockInitialValues({
+      'truco_tope': 30,
+      'truco_empezada': true,
+      'truco_participantes': 2,
+      'truco_name_0': 'Nosotros',
+      'truco_name_1': 'Ellos',
+      'truco_score_0': 28,
+      'truco_score_1': 0,
+    });
+    await tester.pumpWidget(
+      MaterialApp(theme: mesaTheme(), home: CounterScreen(spec: truco)),
+    );
+    await tester.pump();
+
+    final pintores = find.byWidgetPredicate(
+      (w) => w is CustomPaint && w.painter is MatchstickGroupPainter,
+    );
+    // El panel de "Nosotros" (28 puntos = 6 grupos): los primeros 6
+    // CustomPaint con ese painter son los suyos.
+    final posiciones = tester
+        .widgetList(pintores)
+        .take(6)
+        .map((w) => tester.getTopLeft(find.byWidget(w)))
+        .toList();
+
+    // Se redondea antes de agrupar para que diferencias de subpíxel no
+    // inventen columnas o filas fantasma.
+    final xs = posiciones.map((o) => o.dx.round()).toSet();
+    final ys = posiciones.map((o) => o.dy.round()).toSet();
+
+    expect(xs.length, 2, reason: 'dos columnas');
+    expect(ys.length, 3, reason: 'tres filas por columna');
   });
 }

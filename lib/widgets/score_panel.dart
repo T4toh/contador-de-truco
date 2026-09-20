@@ -15,9 +15,9 @@ class ScorePanel extends StatelessWidget {
   final VoidCallback? onRestar;
   final VoidCallback onRenombrar;
 
-  /// Cuántos grupos de fósforos van por línea. Se reenvía a
+  /// Cuántos grupos de fósforos se apilan en cada columna. Se reenvía a
   /// [MatchstickCounter] tal cual.
-  final int? gruposPorLinea;
+  final int? gruposPorColumna;
 
   const ScorePanel({
     super.key,
@@ -28,7 +28,7 @@ class ScorePanel extends StatelessWidget {
     required this.onSumar,
     required this.onRestar,
     required this.onRenombrar,
-    this.gruposPorLinea,
+    this.gruposPorColumna,
   });
 
   @override
@@ -86,7 +86,7 @@ class ScorePanel extends StatelessWidget {
             Expanded(
               child: MatchstickCounter(
                 points: puntaje,
-                gruposPorLinea: gruposPorLinea,
+                gruposPorColumna: gruposPorColumna,
               ),
             ),
             Padding(

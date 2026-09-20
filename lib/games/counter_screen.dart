@@ -144,7 +144,7 @@ class _CounterScreenState extends State<CounterScreen> {
       onSumar: () => _sumar(indice, 1),
       onRestar: _juego.terminada ? null : () => _sumar(indice, -1),
       onRenombrar: () => _renombrar(indice),
-      gruposPorLinea: widget.spec.gruposPorLinea,
+      gruposPorColumna: widget.spec.gruposPorColumna,
     );
   }
 
