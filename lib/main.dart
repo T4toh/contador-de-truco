@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'truco/truco_counter.dart';
-import 'escoba/escoba_counter.dart';
+import 'games/catalog.dart';
+import 'games/counter_screen.dart';
 import 'theme/mesa_theme.dart';
 
 void main() {
@@ -29,41 +29,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
-  static const List<Widget> _pages = [
-    TrucoCounter(),
-    EscobaCounter(),
-  ];
+  int _seleccionado = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
+        index: _seleccionado,
+        children: [
+          for (final spec in catalogo) CounterScreen(spec: spec),
+        ],
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.style_outlined),
-            selectedIcon: Icon(Icons.style),
-            label: 'Truco',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.grid_view_outlined),
-            selectedIcon: Icon(Icons.grid_view),
-            label: 'Escoba del 15',
-          ),
+        selectedIndex: _seleccionado,
+        onDestinationSelected: (i) => setState(() => _seleccionado = i),
+        destinations: [
+          for (final spec in catalogo)
+            NavigationDestination(icon: Icon(spec.icono), label: spec.titulo),
         ],
       ),
     );
   }
 }
-
