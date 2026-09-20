@@ -27,9 +27,13 @@ class _MatchstickCounterState extends State<MatchstickCounter>
   @override
   void didUpdateWidget(MatchstickCounter anterior) {
     super.didUpdateWidget(anterior);
-    // Solo al sumar. Al restar o reiniciar, el dibujo cambia sin animación.
     if (widget.points > anterior.points) {
+      // Solo al sumar: el fósforo nuevo cae.
       _caida.forward(from: 0);
+    } else if (widget.points < anterior.points) {
+      // Al restar o reiniciar, cortamos cualquier caída en curso: si no, el
+      // progreso viejo quedaría aplicado a un fósforo que no es nuevo.
+      _caida.value = 1;
     }
   }
 
