@@ -439,7 +439,7 @@ class _TrucoCounterState extends State<TrucoCounter>
                 Expanded(
                   child: ScaleTransition(
                     scale: _scaleAnimation,
-                    child: MatchstickCounter(points: score, groupsPerRow: 3),
+                    child: MatchstickCounter(points: score),
                   ),
                 ),
                 Padding(
