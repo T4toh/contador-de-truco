@@ -137,8 +137,9 @@ de tab no pierde la partida del otro juego.
   no encaja en el patrón "contador de puntos" de los otros dos juegos.
 - **`applicationId`**: sigue siendo `com.example.contador_de_truco`, el default del template. Hay que
   cambiarlo antes de publicar en Play Store.
-- **Tests**: los que hay son de humo (que la app renderice y navegue). Falta cubrir la lógica de
-  puntaje: el tope, el piso en 0, el umbral de las buenas y la detección de ganador.
+- **Tests**: la lógica de puntaje (el tope, el piso en 0, el umbral de las buenas y la detección de
+  ganador) ya está cubierta en `test/score_game_test.dart`. Falta un test que ejercite la pantalla
+  de juego en sí: tocar, restar, renombrar y la planilla de ganador.
 
 ---
 

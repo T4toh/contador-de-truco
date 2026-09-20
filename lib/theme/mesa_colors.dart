@@ -22,7 +22,7 @@ abstract final class MesaColors {
   static const dorado = Color(0xFFA8813C);
   static const doradoClaro = Color(0xFFF6D98A);
 
-  /// Cabezas de fósforo y botón restar.
+  /// Botón restar.
   static const brasa = Color(0xFFC0392B);
 
   /// Palito del fósforo.

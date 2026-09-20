@@ -22,8 +22,6 @@ ThemeData mesaTheme() {
     onTertiaryContainer: MesaColors.crema,
     error: MesaColors.brasa,
     onError: MesaColors.crema,
-    errorContainer: MesaColors.brasa,
-    onErrorContainer: MesaColors.crema,
     surface: MesaColors.panoBase,
     onSurface: MesaColors.crema,
     surfaceContainerHighest: MesaColors.maderaOscura,

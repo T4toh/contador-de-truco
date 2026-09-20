@@ -44,6 +44,7 @@ class ScorePanel extends StatelessWidget {
                   nombre,
                   style: textos.headlineMedium,
                   textAlign: TextAlign.center,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
