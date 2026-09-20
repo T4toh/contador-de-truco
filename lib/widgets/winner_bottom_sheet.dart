@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../theme/mesa_colors.dart';
 
 class WinnerBottomSheet extends StatelessWidget {
   final String winnerName;
@@ -13,12 +14,10 @@ class WinnerBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: const BoxDecoration(
+        color: MesaColors.maderaOscura,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -31,21 +30,14 @@ class WinnerBottomSheet extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             '¡GANÓ $winnerName!',
-            style: GoogleFonts.raleway(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.primary,
-            ),
+            style: Theme.of(context).textTheme.displaySmall,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 40),
           FilledButton.icon(
             onPressed: onReset,
             icon: const Icon(Icons.refresh),
-            label: Text(
-              'Nueva Partida',
-              style: GoogleFonts.raleway(fontSize: 18),
-            ),
+            label: const Text('Nueva Partida'),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
             ),
