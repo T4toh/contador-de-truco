@@ -109,8 +109,11 @@ class GameStorage {
     final prefs = await SharedPreferences.getInstance();
     final id = spec.id;
 
-    final cuantos =
+    final guardados =
         prefs.getInt('${id}_participantes') ?? spec.participantes.first;
+    // Nunca confiar en el número persistido: puede venir de una versión
+    // anterior con más participantes de los que este spec sabe nombrar.
+    final cuantos = guardados.clamp(1, spec.nombresPorDefecto.length);
     final nombresBase = spec.nombresPorDefecto.take(cuantos).toList();
 
     return ScoreGame(

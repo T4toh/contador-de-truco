@@ -142,4 +142,55 @@ void main() {
     final otra = await storage.cargar(specTruco);
     expect(otra.puntajes[0], 8);
   });
+
+  test('migra Truco v1 aunque falten claves companion', () async {
+    SharedPreferences.setMockInitialValues({
+      'truco_gameStarted': true,
+      'truco_scoreA': 5,
+      // faltan scoreB, maxScore, teamAName y teamBName
+    });
+
+    final storage = GameStorage();
+    await storage.migrar();
+    final g = await storage.cargar(specTruco);
+
+    expect(g.puntajes, [5, 0]);
+    expect(g.nombres, ['Nosotros', 'Ellos']);
+    expect(g.tope, 30);
+    expect(g.empezada, isTrue);
+  });
+
+  test('migra Escoba v1 aunque falte escoba_playerCount', () async {
+    SharedPreferences.setMockInitialValues({
+      'escoba_gameStarted': true,
+      'escoba_score_0': 3,
+      'escoba_name_0': 'Tato',
+    });
+
+    final storage = GameStorage();
+    await storage.migrar();
+    final g = await storage.cargar(specEscoba);
+
+    expect(g.participantes, 2);
+    expect(g.puntajes, [3, 0]);
+    expect(g.nombres[0], 'Tato');
+    expect(g.tope, 15);
+  });
+
+  test('cargar tolera un participantes persistido mayor que los nombres del spec',
+      () async {
+    SharedPreferences.setMockInitialValues({
+      'escoba_participantes': 6, // de una versión con más jugadores
+      'escoba_empezada': true,
+      'escoba_tope': 15,
+      'escoba_score_0': 4,
+    });
+
+    final storage = GameStorage();
+    final g = await storage.cargar(specEscoba);
+
+    expect(g.participantes, lessThanOrEqualTo(4));
+    expect(g.puntajes.length, g.nombres.length);
+    expect(g.puntajes[0], 4);
+  });
 }
