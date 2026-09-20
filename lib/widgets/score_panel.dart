@@ -40,12 +40,32 @@ class ScorePanel extends StatelessWidget {
               padding: const EdgeInsets.only(top: 10),
               child: GestureDetector(
                 onLongPress: onRenombrar,
-                child: Text(
-                  nombre,
-                  style: textos.headlineMedium,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        nombre,
+                        style: textos.headlineMedium,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    GestureDetector(
+                      onTap: onRenombrar,
+                      // Área de toque cómoda sin agrandar el ícono.
+                      child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Icon(
+                          Icons.edit,
+                          size: 16,
+                          color: MesaColors.doradoClaro.withValues(alpha: .65),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

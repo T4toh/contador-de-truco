@@ -119,4 +119,23 @@ void main() {
 
     expect(find.text('Los Pibes'), findsOneWidget);
   });
+
+  testWidgets('el lápiz abre el diálogo de renombrar sin sumar puntos',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(
+      MaterialApp(theme: mesaTheme(), home: CounterScreen(spec: truco)),
+    );
+    await tester.pump();
+    await tester.tap(find.text('A MALAS'));
+    await tester.pump();
+
+    expect(find.text('0'), findsNWidgets(2));
+
+    await tester.tap(find.byIcon(Icons.edit).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nombre del equipo'), findsOneWidget);
+    expect(find.text('0'), findsNWidgets(2));
+  });
 }
