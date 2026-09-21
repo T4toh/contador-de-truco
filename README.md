@@ -13,7 +13,7 @@ Pensada para apoyar el celular en la mesa y tocar la pantalla mientras se juega.
 | ----- | ------ | ------- |
 | **Truco** | ✅ Completo | Partidas a 15 ("a malas") o a 30 ("a buenas"), 2 equipos |
 | **Escoba del 15** | ✅ Completo | 2, 3 o 4 jugadores, partida a 15 puntos |
-| **Generala** | ⏳ Pendiente | Reglas escritas en `docs/generala.md`, sin implementar |
+| **Generala** | ✅ Completo | 2 a 6 jugadores, planilla de 10 casillas, reglamento Ruibal |
 
 ### Truco
 
@@ -28,6 +28,14 @@ Pensada para apoyar el celular en la mesa y tocar la pantalla mientras se juega.
 - 2 o 3 jugadores: los paneles se acomodan según la orientación del teléfono.
 - 4 jugadores: grilla 2x2 siempre, para que cada uno tenga su esquina de la mesa.
 - Nombres de jugador editables (por defecto `Jugador 1`…`Jugador 4`).
+
+### Generala
+
+- Tocá una celda para cargarla: la app ofrece solo los valores válidos de esa casilla (tachar,
+  20 o 25 servida, etc.). Tocar una celda cargada permite corregir o borrar.
+- Mantené apretado el nombre para renombrar.
+- Puntaje según el [reglamento de Ruibal](https://ruibalgames.com/wp-content/uploads/2015/11/Reglamento-Generala.pdf):
+  generala 60, servida gana la partida. Sin doble generala ni bonus.
 
 ---
 
@@ -64,9 +72,11 @@ La partida en curso se guarda sola con `shared_preferences` después de cada cam
 nombres, modo de juego y si hay partida empezada. Si cerrás la app en la mitad de una partida, al
 volver seguís donde estabas.
 
-Las claves están prefijadas por juego (`truco_*`, `escoba_*`). `GameStorage` migra los esquemas
-viejos (claves sin prefijo de cuando la app tenía un solo juego, y versiones anteriores por juego)
-una sola vez al arrancar, antes de que exista cualquier pantalla.
+Las claves de Truco y Escoba están prefijadas por juego (`truco_*`, `escoba_*`). `GameStorage` migra
+los esquemas viejos (claves sin prefijo de cuando la app tenía un solo juego, y versiones anteriores
+por juego) una sola vez al arrancar, antes de que exista cualquier pantalla. Generala guarda su
+partida aparte, como un único JSON bajo la clave `generala_partida`, y no pasa por `GameStorage` ni
+por su migración.
 
 ---
 
@@ -113,32 +123,40 @@ lib/
 │   ├── game_storage.dart            # persistencia + migración de esquemas viejos
 │   ├── counter_screen.dart          # pantalla única que renderiza cualquier GameSpec
 │   ├── panel_layout.dart            # cómo se acomodan los paneles según orientación/cantidad
-│   └── catalog.dart                 # los juegos: Truco y Escoba del 15
+│   └── catalog.dart                 # catálogo de juegos: Truco, Escoba y Generala
+├── generala/                        # planilla de Generala: reglas, modelo, persistencia y pantalla propias
+│   ├── reglas.dart                  # Casilla/Jugada, la única tabla de puntajes
+│   ├── generala_game.dart           # estado y reglas, sin widgets
+│   ├── generala_storage.dart        # persistencia como un JSON bajo generala_partida
+│   ├── generala_screen.dart         # pantalla (setup + planilla + ganador)
+│   ├── planilla.dart                # la tabla de casillas × jugadores
+│   └── jugada_sheet.dart            # ficha para elegir el valor al tocar una celda
 └── widgets/
     ├── felt_background.dart         # fondo de paño
     ├── wood_panel.dart              # panel de madera
     ├── score_panel.dart             # panel de puntaje de un equipo/jugador
     ├── game_header.dart             # header con reset
     ├── name_dialog.dart             # diálogo para renombrar
+    ├── setup_choice.dart            # pantalla de setup con botones grandes
     ├── matchstick_counter.dart      # los fósforos (CustomPainter)
     ├── matchstick_layout.dart       # cálculo de columnas/tamaño de los fósforos
     └── winner_bottom_sheet.dart     # pantalla de ganador
 docs/                                # reglas de cada juego (no docs de código)
 ```
 
-Un juego ya no es un archivo autocontenido: es una entrada (`GameSpec`) en `catalog.dart` — id,
-título, ícono, participantes posibles, topes y nombres por defecto. `CounterScreen` es la única
-pantalla y renderiza cualquier `GameSpec`; agregar un juego nuevo no toca la UI. El estado y las
-reglas viven en `ScoreGame` (sin dependencia de widgets, se testea directo) y la persistencia en
-`GameStorage`, con claves prefijadas por `spec.id`. La navegación usa `IndexedStack`, así que cambiar
-de tab no pierde la partida del otro juego.
+Un juego es una entrada en `catalogo` (`lib/games/catalog.dart`), una `List<Juego>` con título,
+ícono y un constructor de pantalla. Truco y Escoba son contadores: se describen como un `GameSpec`
+puro dato (id, participantes, topes, nombres por defecto) y comparten `CounterScreen`, la pantalla
+única de los contadores. Generala tiene otro modelo — una planilla, no un puntaje que sube — así que
+trae su propia pantalla (`lib/generala/`) en vez de un `GameSpec`. El estado y las reglas de los
+contadores viven en `ScoreGame` (sin dependencia de widgets, se testea directo) y la persistencia en
+`GameStorage`, con claves prefijadas por `spec.id`; Generala tiene su propio modelo y storage. La
+navegación usa `IndexedStack`, así que cambiar de tab no pierde la partida de ningún juego.
 
 ---
 
 ## 🛠️ Pendientes conocidos
 
-- **Generala**: las reglas están en `docs/generala.md` pero no hay código. Su planilla de 13 casillas
-  no encaja en el patrón "contador de puntos" de los otros dos juegos.
 - **Papa**: agregar el juego (reglas y contador).
 - **Reglas de todos los juegos**: `docs/` tiene Truco, Escoba y Generala; cada juego que se agregue
   tiene que entrar con sus reglas.

@@ -1,96 +1,80 @@
 # Generala
 
+Reglas según el **reglamento de Ruibal**, el que viene en la caja del juego:
+<https://ruibalgames.com/wp-content/uploads/2015/11/Reglamento-Generala.pdf>. Hay otras variantes
+(Yahtzee, "doble generala", bonus por números); la app sigue esta.
+
+---
+
 ## Objetivo
 
-Completar una tabla de combinaciones tirando dados, acumulando la mayor cantidad de puntos posible. Gana quien tenga el puntaje más alto al terminar todas las jugadas.
+Completar la planilla de **10 casillas** con el mayor puntaje posible. Gana quien tenga el total más
+alto al terminar, o quien haga una **generala servida** en cualquier momento.
 
 ---
 
 ## Materiales
 
-- **5 dados** estándar de 6 caras.
-- Una **planilla de puntuación** por jugador.
-- De 2 a 6 jugadores.
+- **5 dados** de 6 caras.
+- Una **planilla** por jugador (la app la lleva).
+- De **2 a 6 jugadores**. La cantidad la fija la app; el reglamento no la limita.
 
 ---
 
-## Desarrollo del juego
+## Desarrollo
 
-En su turno, el jugador puede tirar los dados hasta **3 veces**:
+Se sortea quién empieza. El orden sigue las agujas del reloj.
 
-1. **Primera tirada:** se tiran los 5 dados.
-2. **Segunda tirada:** se reservan los dados que se quieran conservar y se vuelven a tirar el resto.
-3. **Tercera tirada:** igual que la segunda.
+En su turno, el jugador tira hasta **3 veces**:
 
-Después de cualquiera de las tres tiradas, el jugador puede **plantarse** y anotar el resultado en su planilla.
+1. **Primer tiro:** los 5 dados.
+2. **Segundo tiro:** aparta los que quiera conservar y tira el resto. Puede volver a tirar los cinco.
+3. **Tercer tiro:** igual que el segundo. Es el último.
 
-> Al finalizar el turno, **se debe anotar obligatoriamente** en alguna casilla, aunque sea un cero (tachar).
+Después de cualquier tiro puede **plantarse** y anotar. Al terminar el turno **tiene que anotar** en
+alguna casilla libre, aunque sea un cero (tachar). Cada casilla se anota **una sola vez**. La partida
+dura **10 vueltas**.
 
 ---
 
-## Combinaciones y puntaje
+## Casillas y puntaje
 
 ### Números (1 al 6)
 
-Se anota la **suma de los dados** que muestren el número elegido.
+Se multiplica la cantidad de dados con ese número por el número. Tres 6 = 18 al seis; dos 4 = 8 al
+cuatro. Máximo 5 dados: cinco 6 = 30.
 
-| Casilla | Condición         | Ejemplo                |
-| ------- | ----------------- | ---------------------- |
-| Unos    | Dados con valor 1 | Tres "1" → 3 puntos    |
-| Doses   | Dados con valor 2 | Tres "2" → 6 puntos    |
-| Treses  | Dados con valor 3 | Dos "3" → 6 puntos     |
-| Cuatros | Dados con valor 4 | Cuatro "4" → 16 puntos |
-| Cincos  | Dados con valor 5 | Dos "5" → 10 puntos    |
-| Seises  | Dados con valor 6 | Cinco "6" → 30 puntos  |
+### Juegos mayores
 
-> **Bonus de números:** si la suma de todas las casillas de números es **63 o más**, se obtiene un bonus de **35 puntos**.
+| Casilla      | Qué es                            | Puntos | Servido |
+| ------------ | --------------------------------- | ------ | ------- |
+| **Escalera** | 1-2-3-4-5 o 2-3-4-5-6             | 20     | 25      |
+| **Full**     | Tres iguales y un par             | 30     | 35      |
+| **Póker**    | Cuatro iguales                    | 40     | 45      |
+| **Generala** | Los cinco iguales                 | 60     | Gana    |
 
----
+**Servido** = sale en el **primer tiro** del turno. Suma 5 puntos, salvo en la generala.
 
-### Combinaciones especiales
+Para generala, póker y full el número de los dados no importa: una generala de 1 vale lo mismo que
+una de 6.
 
-| Casilla            | Condición                         | Puntaje                  |
-| ------------------ | --------------------------------- | ------------------------ |
-| **Escalera**       | 1-2-3-4-5 o 2-3-4-5-6             | 20 pts (o suma de dados) |
-| **Full**           | Trío + par (ej: 3-3-3-5-5)        | 30 pts (o suma de dados) |
-| **Póker**          | Cuatro dados iguales              | 40 pts (o suma de dados) |
-| **Generala**       | Los 5 dados iguales               | 50 pts                   |
-| **Generala doble** | Generala en la **primera tirada** | 100 pts                  |
+### Generala servida
 
-> Algunas variantes usan la **suma real de los dados** en lugar de puntaje fijo para escalera, full y póker.
+Cinco iguales en el primer tiro **gana la partida en el acto**, aunque el jugador ya tenga puntaje en
+ese número.
 
----
+### Elegir dónde anotar
 
-## Generala servida
-
-Si en la **primera tirada** se obtiene cualquier combinación especial sin necesidad de volver a tirar, se dice que está **servida** y vale puntos extra según la variante:
-
-- La Generala servida siempre vale **100 puntos**.
-- Otras combinaciones servidas pueden valer puntaje doble según las reglas acordadas.
+Si sale un juego mayor, el jugador puede anotarlo en su casilla **o** multiplicar los dados del mismo
+número y anotar eso en la casilla de ese número. Por ejemplo, con generala ya hecha, cinco 6 se
+anotan como 30 al seis si el seis está libre.
 
 ---
 
-## La planilla
+## Fin del juego
 
-Cada jugador tiene una planilla con **13 casillas** (6 de números + 7 especiales). Durante la partida, cada casilla se completa **exactamente una vez**: se anota el puntaje obtenido o se tacha con un **cero** si no se pudo o no convino usar esa combinación.
-
-La partida dura **13 rondas** (una por casilla). Al final se suman todos los puntos.
-
----
-
-## Reglas adicionales
-
-- Los dados reservados entre tiradas **no pueden "des-reservarse"** en algunas variantes (verificar antes de jugar).
-- Si se obtiene una **segunda Generala** a lo largo de la partida (ya se anotó la primera), se puede anotar como **Generala doble** si la casilla correspondiente está disponible.
-- En caso de empate al final, los jugadores empatados juegan rondas adicionales hasta desempatar.
-
----
-
-## Variantes comunes
-
-- **Generala americana (Yahtzee):** usa puntajes distintos y tiene casillas como "chance" (suma total de los 5 dados).
-- **Generala por equipo:** dos equipos de 2, se suman los puntajes de cada dupla.
-- **Sin bonus de números:** se omite el bonus de 35 puntos para partidas más simples.
+Cuando todos completaron las 10 casillas se suman los puntos y **gana el mayor total**. Si dos o
+más empatan en el máximo, la app lo muestra como **empate**; el reglamento no lo contempla.
 
 ---
 
