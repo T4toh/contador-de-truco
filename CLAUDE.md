@@ -67,8 +67,11 @@ SHA-256 contra el `digest` que expone la API de GitHub y lanza el instalador.
 ## Arquitectura
 
 App Flutter de contadores de puntaje para juegos de cartas argentinos. Sin backend, sin state
-management externo: todo `StatefulWidget` + `setState` + `CustomPainter`. El único asset son las
-tipografías (`assets/fonts/`).
+management externo: todo `StatefulWidget` + `setState` + `CustomPainter`. Los únicos assets son las
+tipografías (`assets/fonts/`); `assets/icon/pulpero.png` es la fuente del launcher icon, no se
+empaqueta. Los `mipmap-*` (adaptive en `mipmap-anydpi-v26`, fondo crema en `values/colors.xml`) se
+regeneran desde ahí con ImageMagick: alpha = oscuridad del dibujo, arte al 66% para el adaptive y al
+80% para el legacy.
 
 **Shell** — `lib/main.dart`: `main()` corre la migración de `GameStorage` una sola vez, antes de
 `runApp`, envuelta en `try/catch` (si falla, se pierde la partida vieja pero la app abre igual —
