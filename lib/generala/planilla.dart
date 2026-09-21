@@ -131,12 +131,14 @@ class Planilla extends StatelessWidget {
         children: [
           SizedBox(
             width: etiquetas,
-            child: Text(
-              c.simbolo,
-              style: c.numero != null
-                  ? textos.titleMedium?.copyWith(fontSize: tamanoSimbolo)
-                  : textos.titleMedium,
-              maxLines: 1,
+            child: Center(
+              child: Text(
+                c.simbolo,
+                style: c.numero != null
+                    ? textos.titleMedium?.copyWith(fontSize: tamanoSimbolo)
+                    : textos.titleMedium,
+                maxLines: 1,
+              ),
             ),
           ),
           for (var j = 0; j < juego.participantes; j++)
@@ -194,7 +196,7 @@ class Planilla extends StatelessWidget {
         children: [
           SizedBox(
             width: etiquetas,
-            child: Text('Total', style: estilo),
+            child: Center(child: Text('Total', style: estilo)),
           ),
           for (var j = 0; j < juego.participantes; j++)
             Expanded(
