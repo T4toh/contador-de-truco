@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Updater: consulta la API de GitHub y descarga el APK. Flutter solo
+         declara INTERNET en debug y profile; sin esto, el release no tiene red
+         (ya pasó con google_fonts, ver CLAUDE.md). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Updater: lanzar el instalador de Android con el APK descargado. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <application
         android:label="contador_de_truco"
         android:name="${applicationName}"
