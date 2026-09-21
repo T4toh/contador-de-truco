@@ -38,10 +38,10 @@ void main() {
 
     await tester.tap(find.text('3 jugadores'));
     await tester.pump();
-    expect(find.text('Vuelta 1 de 10'), findsOneWidget);
+    expect(find.text('Vuelta 1 de 11'), findsOneWidget);
     expect(find.text('Jugador 1'), findsOneWidget);
     expect(find.text('Jugador 3'), findsOneWidget);
-    expect(find.text('Cuatros'), findsOneWidget);
+    expect(find.text('⚃'), findsOneWidget);
     expect(find.text('Total'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -58,7 +58,7 @@ void main() {
     await tester.tap(find.text('16'));
     await tester.pumpAndSettle();
     expect(find.text('16'), findsNWidgets(2), reason: 'celda y total');
-    expect(find.text('Vuelta 1 de 10'), findsOneWidget,
+    expect(find.text('Vuelta 1 de 11'), findsOneWidget,
         reason: 'los otros dos no cargaron');
   });
 

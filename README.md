@@ -13,7 +13,7 @@ Pensada para apoyar el celular en la mesa y tocar la pantalla mientras se juega.
 | ----- | ------ | ------- |
 | **Truco** | ✅ Completo | Partidas a 15 ("a malas") o a 30 ("a buenas"), 2 equipos |
 | **Escoba del 15** | ✅ Completo | 2, 3 o 4 jugadores, partida a 15 puntos |
-| **Generala** | ✅ Completo | 2 a 6 jugadores, planilla de 10 casillas, reglamento Ruibal |
+| **Generala** | ✅ Completo | 2 a 6 jugadores, planilla de 11 casillas, reglamento Ruibal |
 
 ### Truco
 
@@ -35,7 +35,9 @@ Pensada para apoyar el celular en la mesa y tocar la pantalla mientras se juega.
   20 o 25 servida, etc.). Tocar una celda cargada permite corregir o borrar.
 - Tocá el nombre (o mantenelo apretado) para renombrar.
 - Puntaje según el [reglamento de Ruibal](https://ruibalgames.com/wp-content/uploads/2015/11/Reglamento-Generala.pdf):
-  generala 60, servida gana la partida. Sin doble generala ni bonus.
+  generala 60, generala doble 100, cualquiera de las dos servida gana la partida. Sin bonus por
+  números.
+- La planilla usa las caras de dado (⚀ a ⚅) y E, F, P, G, G2 como en la de papel.
 
 ---
 

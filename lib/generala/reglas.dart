@@ -2,28 +2,31 @@
 /// caja del juego:
 /// https://ruibalgames.com/wp-content/uploads/2015/11/Reglamento-Generala.pdf
 ///
-/// Diez casillas, una por vuelta. Números: cantidad de dados × el número.
+/// Once casillas, una por vuelta. Números: cantidad de dados × el número.
 /// Escalera 20, full 30, póker 40; +5 si salen servidos (en el primer tiro).
-/// Generala 60; generala servida gana la partida en el acto. No hay doble
-/// generala ni bonus de números: eso es de otras variantes (Yahtzee).
+/// Generala 60; generala servida gana la partida en el acto. Generala doble
+/// 100 (segunda generala; servida también gana). No figura en el PDF del
+/// reglamento pero sí en la planilla impresa de Ruibal.
 enum Casilla {
-  uno('Unos', '1', 1),
-  dos('Doses', '2', 2),
-  tres('Treses', '3', 3),
-  cuatro('Cuatros', '4', 4),
-  cinco('Cincos', '5', 5),
-  seis('Seises', '6', 6),
-  escalera('Escalera', 'Esc', null),
-  full('Full', 'Full', null),
-  poker('Póker', 'Pók', null),
-  generala('Generala', 'Gen', null);
+  uno('Unos', '⚀', 1),
+  dos('Doses', '⚁', 2),
+  tres('Treses', '⚂', 3),
+  cuatro('Cuatros', '⚃', 4),
+  cinco('Cincos', '⚄', 5),
+  seis('Seises', '⚅', 6),
+  escalera('Escalera', 'E', null),
+  full('Full', 'F', null),
+  poker('Póker', 'P', null),
+  generala('Generala', 'G', null),
+  doble('Generala doble', 'G2', null);
 
-  const Casilla(this.etiqueta, this.etiquetaCorta, this.numero);
+  const Casilla(this.etiqueta, this.simbolo, this.numero);
 
   final String etiqueta;
 
-  /// Para cuando la columna de etiquetas no tiene ancho para la larga.
-  final String etiquetaCorta;
+  /// Lo que se imprime en la fila de la planilla, como en la de papel: caras
+  /// de dado y una letra.
+  final String simbolo;
 
   /// El número del dado en las seis casillas de números; null en los juegos
   /// mayores.
@@ -40,11 +43,12 @@ enum Casilla {
           Jugada(n * cantidad, '${n * cantidad}'),
       ];
     }
-    if (this == generala) {
-      return const [
+    if (this == generala || this == doble) {
+      final base = this == generala ? 60 : 100;
+      return [
         tachar,
-        Jugada(60, '60'),
-        Jugada(60, 'Servida, gana', servida: true, ganaPartida: true),
+        Jugada(base, '$base'),
+        Jugada(base, 'Servida, gana', servida: true, ganaPartida: true),
       ];
     }
     final base = switch (this) { escalera => 20, full => 30, _ => 40 };

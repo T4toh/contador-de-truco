@@ -32,7 +32,7 @@ class Planilla extends StatelessWidget {
           // columnas: con 6 jugadores en un teléfono todo se achica.
           final anchoEtiqueta = restricciones.maxWidth / (n + 1.6);
           final angosto = anchoEtiqueta < _anchoColumnaLarga;
-          final etiquetas = angosto ? 48.0 : 96.0;
+          final etiquetas = angosto ? 36.0 : 56.0;
 
           return Padding(
             padding: const EdgeInsets.fromLTRB(6, 4, 6, 6),
@@ -117,10 +117,11 @@ class Planilla extends StatelessWidget {
           SizedBox(
             width: etiquetas,
             child: Text(
-              angosto ? c.etiquetaCorta : c.etiqueta,
-              style: textos.labelLarge,
+              c.simbolo,
+              style: c.numero != null
+                  ? textos.titleMedium?.copyWith(fontSize: 26)
+                  : textos.titleMedium,
               maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
           for (var j = 0; j < juego.participantes; j++)

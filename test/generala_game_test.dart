@@ -13,7 +13,9 @@ void main() {
     expect(g.empezada, isFalse);
     expect(g.participantes, 2);
     expect(g.nombres, ['Jugador 1', 'Jugador 2']);
-    expect(g.planilla.every((f) => f.length == 10 && f.every((v) => v == null)),
+    expect(
+        g.planilla.every(
+            (f) => f.length == Casilla.values.length && f.every((v) => v == null)),
         isTrue);
   });
 
@@ -69,7 +71,7 @@ void main() {
     expect(g.completa, isTrue);
     expect(g.terminada, isTrue);
     expect(g.ganadores, [1]);
-    expect(g.vuelta, 10);
+    expect(g.vuelta, 11);
   });
 
   test('empate en el total devuelve varios ganadores', () {
@@ -144,7 +146,10 @@ void main() {
     expect(
       GeneralaGame.desdeJson(jsonEncode({
         'nombres': ['a', 'b'],
-        'planilla': [List.filled(10, null), List.filled(9, null)],
+        'planilla': [
+          List.filled(Casilla.values.length, null),
+          List.filled(Casilla.values.length - 1, null),
+        ],
         'empezada': true,
         'terminada': false,
         'ganadores': [],

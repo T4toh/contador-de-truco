@@ -199,3 +199,10 @@ unidos ("Tato y Flor"). "Nueva partida" vuelve al setup.
 5. Widget test.
 6. Docs y README.
 7. Repaso visual en el teléfono con 2, 4 y 6 jugadores.
+
+## Cambios posteriores
+
+- 2026-09-21: Etiquetas de la planilla: caras de dado y E/F/P/G/G2, pedido del usuario al probar
+  en el teléfono.
+- 2026-09-21: Casilla Generala doble (100, servida gana), 11 casillas: está en la planilla
+  impresa de Ruibal aunque no en el PDF.

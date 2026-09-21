@@ -154,9 +154,11 @@ Hay tres caminos, en este orden:
 - Los puntajes se hacen `.clamp(0, tope)` en `ScoreGame.sumar`, así que restar nunca va a negativo ni
   sumar pasa del tope.
 - **Generala** (`lib/generala/reglas.dart`): reglamento Ruibal, citado en el comentario del enum.
-  Diez casillas; números cantidad × número; escalera 20, full 30, póker 40, +5 servidos; generala
-  60; generala servida termina la partida con ese ganador. Empate en el total = varios `ganadores`.
-  `Casilla.opciones` es la única tabla de puntajes: cambiar una regla es tocar ahí.
+  Once casillas; números cantidad × número; escalera 20, full 30, póker 40, +5 servidos; generala
+  60; generala doble 100; cualquier generala servida termina la partida. Empate en el total =
+  varios `ganadores`. `Casilla.opciones` es la única tabla de puntajes: cambiar una regla es tocar
+  ahí. `Casilla.simbolo` es la etiqueta de la tabla (caras de dado y E/F/P/G/G2, como en la
+  planilla de papel).
 
 ## Convenciones de UI
 

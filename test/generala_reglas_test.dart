@@ -2,10 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:contador_de_truco/generala/reglas.dart';
 
 void main() {
-  test('hay diez casillas, en el orden de la planilla', () {
+  test('hay once casillas, en el orden de la planilla', () {
     expect(Casilla.values.map((c) => c.etiqueta), [
       'Unos', 'Doses', 'Treses', 'Cuatros', 'Cincos', 'Seises',
-      'Escalera', 'Full', 'Póker', 'Generala',
+      'Escalera', 'Full', 'Póker', 'Generala', 'Generala doble',
     ]);
   });
 
@@ -39,8 +39,18 @@ void main() {
     expect(ops.last.etiqueta, 'Servida, gana');
     expect(ops.last.ganaPartida, isTrue);
     expect(ops.last.servida, isTrue);
+  });
+
+  test('la generala doble vale 100 y su servida también gana', () {
+    final ops = Casilla.doble.opciones;
+    expect(ops.map((j) => j.valor), [0, 100, 100]);
+    expect(ops.last.etiqueta, 'Servida, gana');
+    expect(ops.last.ganaPartida, isTrue);
+  });
+
+  test('solo las generalas servidas ganan', () {
     final conGana = Casilla.values.expand((c) => c.opciones).where((j) => j.ganaPartida);
-    expect(conGana.length, 1);
+    expect(conGana.length, 2);
   });
 
   test('jugadaPara identifica las servidas por su valor', () {
@@ -51,10 +61,13 @@ void main() {
     expect(Casilla.cuatro.jugadaPara(7), isNull);
   });
 
-  test('etiquetas cortas para columnas angostas', () {
-    expect(Casilla.cuatro.etiquetaCorta, '4');
-    expect(Casilla.escalera.etiquetaCorta, 'Esc');
-    expect(Casilla.poker.etiquetaCorta, 'Pók');
-    expect(Casilla.generala.etiquetaCorta, 'Gen');
+  test('el símbolo es la cara de dado o la letra de la planilla de papel', () {
+    expect(Casilla.uno.simbolo, '⚀');
+    expect(Casilla.seis.simbolo, '⚅');
+    expect(Casilla.escalera.simbolo, 'E');
+    expect(Casilla.full.simbolo, 'F');
+    expect(Casilla.poker.simbolo, 'P');
+    expect(Casilla.generala.simbolo, 'G');
+    expect(Casilla.doble.simbolo, 'G2');
   });
 }
