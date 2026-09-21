@@ -86,7 +86,7 @@ class _CounterScreenState extends State<CounterScreen> {
           : 'Nombre del equipo',
       actual: _juego.nombres[indice],
     );
-    if (nombre == null) return;
+    if (!mounted || nombre == null) return;
     setState(() => _juego.renombrar(indice, nombre));
     _storage.guardar(_juego);
   }

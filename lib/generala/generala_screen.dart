@@ -100,7 +100,7 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
       titulo: 'Nombre del jugador',
       actual: _juego.nombres[jugador],
     );
-    if (nombre == null) return;
+    if (!mounted || nombre == null) return;
     setState(() => _juego.renombrar(jugador, nombre));
     _storage.guardar(_juego);
   }
