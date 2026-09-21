@@ -101,23 +101,27 @@ class UpdaterPlugin(private val context: Context) : MethodChannel.MethodCallHand
                 val principal = Handler(Looper.getMainLooper())
                 // El hash de un APK de ~50 MB tarda; fuera del hilo de UI.
                 Thread {
-                    val ok = try {
+                    var ok = false
+                    try {
                         val uri = downloadManager.getUriForDownloadedFile(id)
-                        uri != null && sha256(uri) == esperado
+                        ok = uri != null && sha256(uri) == esperado
+                        if (ok) {
+                            context.startActivity(
+                                Intent(Intent.ACTION_VIEW)
+                                    .setDataAndType(uri, MIME_APK)
+                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                            )
+                        } else {
+                            // Borra el archivo y el registro: no se instala nada corrupto.
+                            downloadManager.remove(id)
+                        }
                     } catch (e: Exception) {
-                        false
+                        // Sin instalador que abra el APK, o cualquier otra falla: no se instala nada.
+                        ok = false
+                        runCatching { downloadManager.remove(id) }
+                    } finally {
+                        principal.post { result.success(ok) }
                     }
-                    if (ok) {
-                        context.startActivity(
-                            Intent(Intent.ACTION_VIEW)
-                                .setDataAndType(downloadManager.getUriForDownloadedFile(id), MIME_APK)
-                                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
-                    } else {
-                        // Borra el archivo y el registro: no se instala nada corrupto.
-                        downloadManager.remove(id)
-                    }
-                    principal.post { result.success(ok) }
                 }.start()
             }
 
