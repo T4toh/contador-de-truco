@@ -65,8 +65,8 @@ En Truco y Escoba (Generala es una planilla, no un puntaje que sube). Los puntos
 diagonal. Está hecho con `CustomPainter` — no hay imágenes en el proyecto.
 
 El resto de la interfaz sigue el tema "paño y madera": fondo verde de mesa de juego y paneles de
-madera, con tipografía **Alegreya** vía `google_fonts`. Es un único tema oscuro fijo — no sigue el
-modo claro/oscuro del sistema.
+madera, con tipografía **Alegreya** empaquetada en `assets/fonts/`. Es un único tema oscuro fijo — no
+sigue el modo claro/oscuro del sistema.
 
 ---
 

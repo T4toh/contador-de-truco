@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:contador_de_truco/generala/generala_screen.dart';
+import 'package:contador_de_truco/generala/planilla.dart';
 import 'package:contador_de_truco/theme/mesa_theme.dart';
 
 Future<void> _montar(WidgetTester tester, {int jugadores = 3}) async {
@@ -46,8 +47,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('tocar una celda abre las fichas y anotar actualiza el total',
-      (tester) async {
+  testWidgets('tocar una celda abre las fichas y anotar actualiza el total', (
+    tester,
+  ) async {
     await _montar(tester);
 
     await tester.tap(find.byKey(const ValueKey('celda-0-cuatro')));
@@ -58,8 +60,11 @@ void main() {
     await tester.tap(find.text('16'));
     await tester.pumpAndSettle();
     expect(find.text('16'), findsNWidgets(2), reason: 'celda y total');
-    expect(find.text('Vuelta 1 de 11'), findsOneWidget,
-        reason: 'los otros dos no cargaron');
+    expect(
+      find.text('Vuelta 1 de 11'),
+      findsOneWidget,
+      reason: 'los otros dos no cargaron',
+    );
   });
 
   testWidgets('una celda cargada ofrece borrar', (tester) async {
@@ -95,19 +100,21 @@ void main() {
     expect(find.text('Jugador 2'), findsNothing);
   });
 
-  testWidgets('generala servida gana en el acto y nueva partida vuelve al setup',
-      (tester) async {
-    await _montar(tester, jugadores: 2);
-    await tester.tap(find.byKey(const ValueKey('celda-1-generala')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Servida, gana'));
-    await tester.pumpAndSettle();
-    expect(find.text('¡GANÓ Jugador 2!'), findsOneWidget);
+  testWidgets(
+    'generala servida gana en el acto y nueva partida vuelve al setup',
+    (tester) async {
+      await _montar(tester, jugadores: 2);
+      await tester.tap(find.byKey(const ValueKey('celda-1-generala')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Servida, gana'));
+      await tester.pumpAndSettle();
+      expect(find.text('¡GANÓ Jugador 2!'), findsOneWidget);
 
-    await tester.tap(find.text('Nueva Partida'));
-    await tester.pumpAndSettle();
-    expect(find.text('¿Cuántos jugadores?'), findsOneWidget);
-  });
+      await tester.tap(find.text('Nueva Partida'));
+      await tester.pumpAndSettle();
+      expect(find.text('¿Cuántos jugadores?'), findsOneWidget);
+    },
+  );
 
   testWidgets('la partida sobrevive a remontar la pantalla', (tester) async {
     await _montar(tester);
@@ -126,7 +133,9 @@ void main() {
     expect(find.text('Jugador 3'), findsOneWidget);
   });
 
-  testWidgets('6 jugadores en landscape de celular no desbordan', (tester) async {
+  testWidgets('6 jugadores en landscape de celular no desbordan', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 360);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -135,13 +144,44 @@ void main() {
       MaterialApp(theme: mesaTheme(), home: const GeneralaScreen()),
     );
     await tester.pump();
-    await tester.scrollUntilVisible(find.text('6 jugadores'), 100,
-        scrollable: find.byType(Scrollable).first);
+    await tester.scrollUntilVisible(
+      find.text('6 jugadores'),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('6 jugadores'));
     await tester.pump();
     expect(tester.takeException(), isNull);
     // A 800x360 el ancho de columna (~102px) no baja del umbral angosto
     // (72px), así que la planilla no entra en modo angosto acá; lo que
     // importa en este viewport es que no desborde.
+    expect(
+      tester.getSize(find.byKey(const ValueKey('celda-0-uno'))).height,
+      greaterThanOrEqualTo(34),
+    );
+    expect(
+      find.descendant(
+        of: find.byType(Planilla),
+        matching: find.byType(SingleChildScrollView),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('6 jugadores en portrait usan nombres cortos', (tester) async {
+    tester.view.physicalSize = const Size(390, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(
+      MaterialApp(theme: mesaTheme(), home: const GeneralaScreen()),
+    );
+    await tester.pump();
+    await tester.tap(find.text('6 jugadores'));
+    await tester.pump();
+    expect(find.text('J#1'), findsOneWidget);
+    expect(find.text('J#6'), findsOneWidget);
+    expect(find.byIcon(Icons.edit), findsNWidgets(6));
+    expect(tester.takeException(), isNull);
   });
 }

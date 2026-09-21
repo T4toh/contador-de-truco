@@ -4,8 +4,17 @@ import 'package:contador_de_truco/generala/reglas.dart';
 void main() {
   test('hay once casillas, en el orden de la planilla', () {
     expect(Casilla.values.map((c) => c.etiqueta), [
-      'Unos', 'Doses', 'Treses', 'Cuatros', 'Cincos', 'Seises',
-      'Escalera', 'Full', 'Póker', 'Generala', 'Generala doble',
+      'Unos',
+      'Doses',
+      'Treses',
+      'Cuatros',
+      'Cincos',
+      'Seises',
+      'Escalera',
+      'Full',
+      'Póker',
+      'Generala',
+      'Generala doble',
     ]);
   });
 
@@ -19,9 +28,18 @@ void main() {
 
   test('los números valen cantidad por número, de 1 a 5 dados', () {
     expect(Casilla.cuatro.opciones.map((j) => j.valor), [0, 4, 8, 12, 16, 20]);
-    expect(Casilla.seis.opciones.map((j) => j.etiqueta),
-        ['✕', '6', '12', '18', '24', '30']);
-    expect(Casilla.uno.opciones.any((j) => j.servida || j.ganaPartida), isFalse);
+    expect(Casilla.seis.opciones.map((j) => j.etiqueta), [
+      '✕',
+      '6',
+      '12',
+      '18',
+      '24',
+      '30',
+    ]);
+    expect(
+      Casilla.uno.opciones.any((j) => j.servida || j.ganaPartida),
+      isFalse,
+    );
   });
 
   test('los juegos mayores valen 20/30/40 y +5 servidos', () {
@@ -49,15 +67,20 @@ void main() {
   });
 
   test('solo las generalas servidas ganan', () {
-    final conGana = Casilla.values.expand((c) => c.opciones).where((j) => j.ganaPartida);
+    final conGana = Casilla.values
+        .expand((c) => c.opciones)
+        .where((j) => j.ganaPartida);
     expect(conGana.length, 2);
   });
 
   test('jugadaPara identifica las servidas por su valor', () {
     expect(Casilla.escalera.jugadaPara(25)?.servida, isTrue);
     expect(Casilla.escalera.jugadaPara(20)?.servida, isFalse);
-    expect(Casilla.generala.jugadaPara(60)?.servida, isFalse,
-        reason: 'la primera coincidencia es la generala común');
+    expect(
+      Casilla.generala.jugadaPara(60)?.servida,
+      isFalse,
+      reason: 'la primera coincidencia es la generala común',
+    );
     expect(Casilla.cuatro.jugadaPara(7), isNull);
   });
 

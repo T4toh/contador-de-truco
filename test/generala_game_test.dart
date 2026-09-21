@@ -14,9 +14,11 @@ void main() {
     expect(g.participantes, 2);
     expect(g.nombres, ['Jugador 1', 'Jugador 2']);
     expect(
-        g.planilla.every(
-            (f) => f.length == Casilla.values.length && f.every((v) => v == null)),
-        isTrue);
+      g.planilla.every(
+        (f) => f.length == Casilla.values.length && f.every((v) => v == null),
+      ),
+      isTrue,
+    );
   });
 
   test('empezar arma N jugadores y conserva nombres ya puestos', () {
@@ -53,7 +55,7 @@ void main() {
     expect(g.total(1), 0);
   });
 
-  test('vuelta es el mínimo de casillas cargadas más uno, hasta 10', () {
+  test('vuelta es el mínimo de casillas cargadas más uno, hasta 11', () {
     final g = GeneralaGame.nueva()..empezar(2);
     expect(g.vuelta, 1);
     g.anotar(0, Casilla.uno, tachar);
@@ -141,21 +143,42 @@ void main() {
   test('desdeJson devuelve null con basura o formas inválidas', () {
     expect(GeneralaGame.desdeJson(null), isNull);
     expect(GeneralaGame.desdeJson('no es json'), isNull);
-    expect(GeneralaGame.desdeJson('{"nombres":["a"],"planilla":[[1]]}'), isNull,
-        reason: 'un jugador y una casilla');
     expect(
-      GeneralaGame.desdeJson(jsonEncode({
-        'nombres': ['a', 'b'],
-        'planilla': [
-          List.filled(Casilla.values.length, null),
-          List.filled(Casilla.values.length - 1, null),
-        ],
-        'empezada': true,
-        'terminada': false,
-        'ganadores': [],
-      })),
+      GeneralaGame.desdeJson('{"nombres":["a"],"planilla":[[1]]}'),
+      isNull,
+      reason: 'un jugador y una casilla',
+    );
+    expect(
+      GeneralaGame.desdeJson(
+        jsonEncode({
+          'nombres': ['a', 'b'],
+          'planilla': [
+            List.filled(Casilla.values.length, null),
+            List.filled(Casilla.values.length - 1, null),
+          ],
+          'empezada': true,
+          'terminada': false,
+          'ganadores': [],
+        }),
+      ),
       isNull,
       reason: 'una fila corta',
+    );
+    expect(
+      GeneralaGame.desdeJson(
+        jsonEncode({
+          'nombres': ['a', 'b'],
+          'planilla': [
+            List.filled(Casilla.values.length, null),
+            List.filled(Casilla.values.length, null),
+          ],
+          'empezada': true,
+          'terminada': false,
+          'ganadores': [5],
+        }),
+      ),
+      isNull,
+      reason: 'un ganador fuera de rango',
     );
   });
 

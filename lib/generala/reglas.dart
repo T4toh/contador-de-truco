@@ -51,7 +51,12 @@ enum Casilla {
         Jugada(base, 'Servida, gana', servida: true, ganaPartida: true),
       ];
     }
-    final base = switch (this) { escalera => 20, full => 30, _ => 40 };
+    final base = switch (this) {
+      escalera => 20,
+      full => 30,
+      poker => 40,
+      _ => throw StateError('sin puntaje base: $name'),
+    };
     return [
       tachar,
       Jugada(base, '$base'),

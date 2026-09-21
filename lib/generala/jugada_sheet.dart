@@ -46,8 +46,9 @@ class JugadaSheet extends StatelessWidget {
                 Expanded(
                   child: Text(
                     jugador,
-                    style: textos.labelLarge
-                        ?.copyWith(color: MesaColors.doradoClaro),
+                    style: textos.labelLarge?.copyWith(
+                      color: MesaColors.doradoClaro,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -69,7 +70,9 @@ class JugadaSheet extends StatelessWidget {
                       foregroundColor: MesaColors.crema,
                       side: const BorderSide(color: MesaColors.dorado),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 16),
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                     ),
                     child: Text('Borrar', style: textos.labelLarge),
                   ),
@@ -86,9 +89,11 @@ class JugadaSheet extends StatelessWidget {
     final fondo = esTachar
         ? MesaColors.brasa
         : j.servida
-            ? MesaColors.dorado
-            : MesaColors.maderaClara;
-    final frente = j.servida && !esTachar ? MesaColors.maderaBorde : MesaColors.crema;
+        ? MesaColors.dorado
+        : MesaColors.maderaClara;
+    final frente = j.servida && !esTachar
+        ? MesaColors.maderaBorde
+        : MesaColors.crema;
     return FilledButton.tonal(
       onPressed: () {
         Navigator.pop(context);

@@ -7,7 +7,12 @@ const minJugadores = 2;
 const maxJugadores = 6;
 
 const nombresPorDefecto = [
-  'Jugador 1', 'Jugador 2', 'Jugador 3', 'Jugador 4', 'Jugador 5', 'Jugador 6',
+  'Jugador 1',
+  'Jugador 2',
+  'Jugador 3',
+  'Jugador 4',
+  'Jugador 5',
+  'Jugador 6',
 ];
 
 /// Para columnas angostas, mientras el nombre siga siendo el de fábrica.
@@ -37,14 +42,14 @@ class GeneralaGame {
   });
 
   factory GeneralaGame.nueva() => GeneralaGame(
-        nombres: nombresPorDefecto.take(minJugadores).toList(),
-        planilla: _vacia(minJugadores),
-      );
+    nombres: nombresPorDefecto.take(minJugadores).toList(),
+    planilla: _vacia(minJugadores),
+  );
 
   static List<List<int?>> _vacia(int jugadores) => List.generate(
-        jugadores,
-        (_) => List<int?>.filled(Casilla.values.length, null),
-      );
+    jugadores,
+    (_) => List<int?>.filled(Casilla.values.length, null),
+  );
 
   int get participantes => planilla.length;
 
@@ -87,12 +92,14 @@ class GeneralaGame {
 
   int cargadas(int jugador) => planilla[jugador].whereType<int>().length;
 
-  bool get completa =>
-      planilla.every((fila) => fila.every((v) => v != null));
+  bool get completa => planilla.every((fila) => fila.every((v) => v != null));
 
-  /// 1 a 10: la casilla que están completando. Manda el que menos cargó.
+  /// 1 a `Casilla.values.length`: la casilla que están completando. Manda el
+  /// que menos cargó.
   int get vuelta {
-    final minimo = planilla.map((f) => f.whereType<int>().length).reduce(math.min);
+    final minimo = planilla
+        .map((f) => f.whereType<int>().length)
+        .reduce(math.min);
     return (minimo + 1).clamp(1, Casilla.values.length);
   }
 
@@ -119,12 +126,12 @@ class GeneralaGame {
   }
 
   Map<String, dynamic> toJson() => {
-        'nombres': nombres,
-        'planilla': planilla,
-        'empezada': empezada,
-        'terminada': terminada,
-        'ganadores': ganadores,
-      };
+    'nombres': nombres,
+    'planilla': planilla,
+    'empezada': empezada,
+    'terminada': terminada,
+    'ganadores': ganadores,
+  };
 
   /// null si el texto no es una partida válida: el que llama arranca una nueva.
   static GeneralaGame? desdeJson(String? texto) {
@@ -140,12 +147,14 @@ class GeneralaGame {
       if (planilla.any((f) => f.length != Casilla.values.length)) return null;
       final nombres = [for (final s in m['nombres'] as List) s as String];
       if (nombres.length != n) return null;
+      final ganadores = [for (final g in m['ganadores'] as List) g as int];
+      if (ganadores.any((g) => g < 0 || g >= n)) return null;
       return GeneralaGame(
         nombres: nombres,
         planilla: planilla,
         empezada: m['empezada'] as bool,
         terminada: m['terminada'] as bool,
-        ganadores: [for (final g in m['ganadores'] as List) g as int],
+        ganadores: ganadores,
       );
     } catch (_) {
       return null;

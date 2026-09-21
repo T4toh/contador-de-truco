@@ -34,16 +34,34 @@ class Planilla extends StatelessWidget {
           final angosto = anchoEtiqueta < _anchoColumnaLarga;
           final etiquetas = angosto ? 36.0 : 56.0;
 
+          // Cabecera + 11 casillas + total.
+          const altoFilaMinimo = 40.0;
+          final altoFila =
+              restricciones.maxHeight / (Casilla.values.length + 2);
+          final apretado = altoFila < 34;
+          final altoEfectivo = apretado ? altoFilaMinimo : altoFila;
+
+          final filas = [
+            _cabecera(context, etiquetas, angosto),
+            for (final c in Casilla.values)
+              _fila(context, c, etiquetas, altoEfectivo),
+            _total(context, etiquetas),
+          ];
+
+          final tabla = apretado
+              ? SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      for (final f in filas)
+                        SizedBox(height: altoFilaMinimo, child: f),
+                    ],
+                  ),
+                )
+              : Column(children: [for (final f in filas) Expanded(child: f)]);
+
           return Padding(
             padding: const EdgeInsets.fromLTRB(6, 4, 6, 6),
-            child: Column(
-              children: [
-                Expanded(child: _cabecera(context, etiquetas, angosto)),
-                for (final c in Casilla.values)
-                  Expanded(child: _fila(context, c, etiquetas, angosto)),
-                Expanded(child: _total(context, etiquetas)),
-              ],
-            ),
+            child: tabla,
           );
         },
       ),
@@ -51,10 +69,9 @@ class Planilla extends StatelessWidget {
   }
 
   Widget _cabecera(BuildContext context, double etiquetas, bool angosto) {
-    final estilo = Theme.of(context)
-        .textTheme
-        .titleMedium
-        ?.copyWith(color: MesaColors.doradoClaro);
+    final estilo = Theme.of(
+      context,
+    ).textTheme.titleMedium?.copyWith(color: MesaColors.doradoClaro);
     return Container(
       decoration: const BoxDecoration(
         border: Border(bottom: BorderSide(color: MesaColors.dorado)),
@@ -80,14 +97,12 @@ class Planilla extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (!angosto) ...[
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.edit,
-                        size: 14,
-                        color: MesaColors.doradoClaro,
-                      ),
-                    ],
+                    SizedBox(width: angosto ? 2 : 4),
+                    Icon(
+                      Icons.edit,
+                      size: angosto ? 11 : 14,
+                      color: MesaColors.doradoClaro,
+                    ),
                   ],
                 ),
               ),
@@ -103,9 +118,9 @@ class Planilla extends StatelessWidget {
     return angosto && deFabrica ? nombresCortos[j] : nombre;
   }
 
-  Widget _fila(
-      BuildContext context, Casilla c, double etiquetas, bool angosto) {
+  Widget _fila(BuildContext context, Casilla c, double etiquetas, double alto) {
     final textos = Theme.of(context).textTheme;
+    final tamanoSimbolo = (alto * 0.7).clamp(16.0, 26.0);
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -119,7 +134,7 @@ class Planilla extends StatelessWidget {
             child: Text(
               c.simbolo,
               style: c.numero != null
-                  ? textos.titleMedium?.copyWith(fontSize: 26)
+                  ? textos.titleMedium?.copyWith(fontSize: tamanoSimbolo)
                   : textos.titleMedium,
               maxLines: 1,
             ),
@@ -161,26 +176,26 @@ class Planilla extends StatelessWidget {
           borderRadius: BorderRadius.circular(6),
         ),
         alignment: Alignment.center,
-        child: Text(
-          texto,
-          style: textos.titleMedium?.copyWith(color: color),
-        ),
+        child: Text(texto, style: textos.titleMedium?.copyWith(color: color)),
       ),
     );
   }
 
   Widget _total(BuildContext context, double etiquetas) {
     final estilo = Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: MesaColors.doradoClaro,
-          fontWeight: FontWeight.w700,
-        );
+      color: MesaColors.doradoClaro,
+      fontWeight: FontWeight.w700,
+    );
     return Container(
       decoration: const BoxDecoration(
         border: Border(top: BorderSide(color: MesaColors.dorado, width: 2)),
       ),
       child: Row(
         children: [
-          SizedBox(width: etiquetas, child: Text('Total', style: estilo)),
+          SizedBox(
+            width: etiquetas,
+            child: Text('Total', style: estilo),
+          ),
           for (var j = 0; j < juego.participantes; j++)
             Expanded(
               child: Center(child: Text('${juego.total(j)}', style: estilo)),
