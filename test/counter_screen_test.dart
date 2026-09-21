@@ -229,4 +229,94 @@ void main() {
     // encontrable, no lo tapó el traslado.
     expect(find.text('28'), findsOneWidget);
   });
+
+  /// Escoba a 4 con puntaje sembrado: 14 puntos son 3 grupos sin terminar
+  /// la partida (el tope es 15 y ahí aparece la planilla de ganador).
+  Map<String, Object> escobaA4({int puntos = 14}) => {
+        'escoba_tope': 15,
+        'escoba_empezada': true,
+        'escoba_participantes': 4,
+        'escoba_name_0': 'Jugador 1',
+        'escoba_name_1': 'Jugador 2',
+        'escoba_name_2': 'Jugador 3',
+        'escoba_name_3': 'Jugador 4',
+        'escoba_score_0': puntos,
+        'escoba_score_1': 0,
+        'escoba_score_2': 0,
+        'escoba_score_3': 0,
+      };
+
+  testWidgets('la Escoba a 4 en un teléfono no desborda ni achica los fósforos',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    SharedPreferences.setMockInitialValues(escobaA4());
+    await tester.pumpWidget(
+      MaterialApp(theme: mesaTheme(), home: CounterScreen(spec: escoba)),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+
+    final pintores = find.byWidgetPredicate(
+      (w) => w is CustomPaint && w.painter is MatchstickGroupPainter,
+    );
+    final grupos = tester.widgetList(pintores).take(3).toList();
+    final posiciones =
+        grupos.map((w) => tester.getTopLeft(find.byWidget(w))).toList();
+
+    // Un solo eje: los tres grupos comparten columna.
+    expect(posiciones.map((o) => o.dx.round()).toSet().length, 1,
+        reason: 'una sola columna');
+    expect(posiciones.map((o) => o.dy.round()).toSet().length, 3,
+        reason: 'tres filas');
+
+    // Antes de arreglar el ancho del panel esto daba el mínimo de 20.
+    final lado = tester.getSize(find.byWidget(grupos.first)).width;
+    expect(lado, greaterThanOrEqualTo(44));
+  });
+
+  testWidgets('en un teléfono la Escoba muestra J#1; en tablet, Jugador 1',
+      (tester) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    for (final caso in [
+      (const Size(390, 844), 'J#1', 'Jugador 1'),
+      (const Size(1600, 1000), 'Jugador 1', 'J#1'),
+    ]) {
+      tester.view.physicalSize = caso.$1;
+      SharedPreferences.setMockInitialValues(escobaA4());
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: mesaTheme(),
+          home: CounterScreen(key: ValueKey(caso.$1), spec: escoba),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text(caso.$2), findsOneWidget, reason: '${caso.$1}');
+      expect(find.text(caso.$3), findsNothing, reason: '${caso.$1}');
+    }
+  });
+
+  testWidgets('un nombre puesto por el usuario no se abrevia nunca',
+      (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    SharedPreferences.setMockInitialValues({
+      ...escobaA4(),
+      'escoba_name_0': 'Tato',
+    });
+    await tester.pumpWidget(
+      MaterialApp(theme: mesaTheme(), home: CounterScreen(spec: escoba)),
+    );
+    await tester.pump();
+
+    expect(find.text('Tato'), findsOneWidget);
+    expect(find.text('J#1'), findsNothing);
+  });
 }

@@ -136,8 +136,13 @@ class _CounterScreenState extends State<CounterScreen> {
     final muestra = _juego.muestraHito && hito != null;
     final cruzo = _juego.cruzoElHito(indice);
 
+    final cortos = widget.spec.nombresCortos;
+    final sinRenombrar =
+        _juego.nombres[indice] == widget.spec.nombresPorDefecto[indice];
+
     return ScorePanel(
       nombre: _juego.nombres[indice],
+      nombreCorto: cortos != null && sinRenombrar ? cortos[indice] : null,
       puntaje: _juego.puntajes[indice],
       chip: muestra ? (cruzo ? hito.despues : hito.antes) : null,
       chipActivo: cruzo,

@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' show Size;
 
 /// Resultado de acomodar los grupos de fósforos en el espacio disponible.
@@ -27,13 +28,18 @@ class MatchLayout {
 /// antes de degradar, porque un grupo apretado es preferible a uno que
 /// pinta fuera del panel.
 ///
+/// Sin `gruposPorColumna` los grupos van en un solo eje: todos en una fila
+/// o todos en una columna, el que deje el grupo más grande. Mezclar los dos
+/// ejes deja un bloque irregular (tres grupos como 2+1) que se lee peor y
+/// aprovecha menos el panel. Solo si ni siquiera el mejor eje llega a
+/// `pisoAbsoluto` se cae a la grilla, que reparte en dos ejes para no
+/// desbordar.
+///
 /// `gruposPorColumna`, si no es null, fija la cantidad de filas (por
 /// ejemplo 3 en el Truco, porque tres grupos son 15 puntos: una columna
 /// llena se lee de un vistazo como las malas o las buenas completas). El
 /// tamaño se busca de todas formas de mayor a menor para que esa cantidad
-/// entre a lo alto y las columnas resultantes entren a lo ancho. Si es
-/// null, el comportamiento es el de siempre: las columnas salen del
-/// espacio disponible.
+/// entre a lo alto y las columnas resultantes entren a lo ancho.
 MatchLayout calcularLayout({
   required int puntos,
   required Size espacio,
@@ -47,6 +53,11 @@ MatchLayout calcularLayout({
   final grupos = (puntos / 5).ceil();
   if (grupos <= 0) {
     return MatchLayout(tamanoGrupo: minGrupo, columnas: 0, filas: 0, separacion: separacion);
+  }
+
+  if (gruposPorColumna == null) {
+    final eje = _ejeUnico(grupos, espacio, separacion, maxGrupo, pisoAbsoluto);
+    if (eje != null) return eje;
   }
 
   for (var tamano = maxGrupo; tamano >= pisoAbsoluto; tamano -= paso) {
@@ -88,6 +99,35 @@ MatchLayout calcularLayout({
     tamanoGrupo: pisoAbsoluto,
     columnas: columnasFinales,
     filas: filasFinales,
+    separacion: separacion,
+  );
+}
+
+/// Todos los grupos en una fila o todos en una columna, el que permita el
+/// grupo más grande. Devuelve null si ni el mejor de los dos llega a
+/// `pisoAbsoluto`: ahí el eje único no entra y decide la grilla.
+MatchLayout? _ejeUnico(
+  int grupos,
+  Size espacio,
+  double separacion,
+  double maxGrupo,
+  double pisoAbsoluto,
+) {
+  final huecos = (grupos - 1) * separacion;
+  // En una fila el límite a lo ancho se reparte entre los grupos y el alto
+  // lo toma uno solo; en una columna es al revés.
+  final enFila = math.min((espacio.width - huecos) / grupos, espacio.height);
+  final enColumna = math.min((espacio.height - huecos) / grupos, espacio.width);
+
+  // Empate a favor de la fila: es como se anota en un papel.
+  final horizontal = enFila >= enColumna;
+  final tamano = (horizontal ? enFila : enColumna).floorToDouble();
+  if (tamano < pisoAbsoluto) return null;
+
+  return MatchLayout(
+    tamanoGrupo: tamano > maxGrupo ? maxGrupo : tamano,
+    columnas: horizontal ? grupos : 1,
+    filas: horizontal ? 1 : grupos,
     separacion: separacion,
   );
 }

@@ -35,6 +35,13 @@ ThemeData mesaTheme() {
 
   return base.copyWith(
     scaffoldBackgroundColor: MesaColors.panoBase,
+    // Ripple clásico en vez del InkSparkle de Material 3: el sparkle pinta
+    // con un fragment shader (`shaders/ink_sparkle.frag`) que el runner de
+    // `flutter test` no puede compilar —el asset del SDK trae solo stages
+    // Vulkan y el runner usa SkSL—, así que cualquier toque en un botón
+    // tiraba una excepción en los tests. Además el destello no aporta nada
+    // sobre la madera.
+    splashFactory: InkRipple.splashFactory,
     textTheme: sans.copyWith(
       // Puntaje grande.
       displaySmall: GoogleFonts.alegreya(

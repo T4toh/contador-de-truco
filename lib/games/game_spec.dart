@@ -19,6 +19,11 @@ class GameSpec {
   /// partida se toman los primeros N.
   final List<String> nombresPorDefecto;
 
+  /// Nombres para pantallas angostas, donde `Jugador 3` no entra. Misma
+  /// longitud que [nombresPorDefecto]. Solo se usan mientras el nombre siga
+  /// siendo el de fábrica: si el usuario renombró, manda lo que puso él.
+  final List<String>? nombresCortos;
+
   final Hito? hito;
 
   /// Cuántos grupos de cinco se apilan en cada columna. En el Truco son 3,
@@ -36,6 +41,7 @@ class GameSpec {
     required this.topes,
     this.etiquetasTope,
     required this.nombresPorDefecto,
+    this.nombresCortos,
     this.hito,
     this.gruposPorColumna,
   });

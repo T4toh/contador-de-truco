@@ -20,6 +20,26 @@ horizontal.
 
 `applicationId`: `io.github.t4toh.contadordetruco`. Se usa el namespace `io.github.<usuario>` porque no hay dominio propio; es la convención habitual para apps sin dominio.
 
+## Firma
+
+El release se firma con un keystore propio, no con el de debug. `android/app/build.gradle.kts` lee
+`android/key.properties` (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`); si ese archivo no
+existe cae a la firma de debug, así que `flutter run --release` sigue andando en un clone limpio —
+pero ese APK no sirve para distribuir.
+
+Ni el `.jks` ni `key.properties` están en el repo (`android/.gitignore:12-14`), y el keystore vive
+fuera del árbol de trabajo. **Una PC nueva necesita que le copies las dos cosas a mano**: sin eso
+firma con el debug keystore de esa máquina, que es distinto al de las demás, y Android rechaza la
+instalación con `INSTALL_FAILED_UPDATE_INCOMPATIBLE` — hay que desinstalar, y eso borra las partidas
+guardadas.
+
+Perder el keystore o su password es irreversible: no hay forma de volver a firmar una actualización
+de una instalación existente.
+
+El `versionCode` sale de `flutter.versionCode`, o sea del `version:` de `pubspec.yaml` (`1.0.0+1`, el
+número después del `+`). Android solo acepta actualizar a un `versionCode` mayor, así que hay que
+subirlo en cada release.
+
 ## Arquitectura
 
 App Flutter de contadores de puntaje para juegos de cartas argentinos. Sin backend, sin state
@@ -56,15 +76,31 @@ versiones v1 de Truco y Escoba) de forma idempotente, guardando `schema_version`
 montado) las hacía correr en paralelo y podían pisarse entre sí.
 
 **Layout de los fósforos** — `calcularLayout` en `lib/widgets/matchstick_layout.dart` mide el espacio
-disponible (`Size`) y elige el tamaño de grupo más grande que entra sin desbordar, iterando de
-`maxGrupo` a `minGrupo`. Ya no hay `FittedBox` estirando el dibujo: por eso en tablet aparecen más
-fósforos del mismo tamaño real en vez de fósforos gigantes, y por eso se arregló el clipping crónico
-de versiones anteriores. **No reintroducir un `FittedBox` u otro estirado a llenar el espacio** —
-volvería a producir el mismo bug de clipping.
+disponible (`Size`) y elige el tamaño de grupo más grande que entra sin desbordar. Ya no hay
+`FittedBox` estirando el dibujo: por eso en tablet aparecen más fósforos del mismo tamaño real en vez
+de fósforos gigantes, y por eso se arregló el clipping crónico de versiones anteriores. **No
+reintroducir un `FittedBox` u otro estirado a llenar el espacio** — volvería a producir el mismo bug
+de clipping.
+
+Hay tres caminos, en este orden:
+
+1. **Eje único** (cuando `gruposPorColumna` es null, o sea todo juego que no sea Truco): todos los
+   grupos en una sola fila o en una sola columna, el eje que deje el grupo más grande, por
+   aritmética directa. Empate a favor de la fila. Mezclar los dos ejes deja bloques irregulares
+   (tres grupos como 2+1) que se leen peor.
+2. **`gruposPorColumna` fijo** (Truco, 3): las filas las fija el juego y las columnas salen de la
+   división; el tamaño se busca de `maxGrupo` hacia abajo. Las 2 columnas × 3 grupos de una partida
+   a 30 son deliberadas, no un layout mezclado por accidente.
+3. **Grilla**, solo si ni el mejor eje único llega a `pisoAbsoluto`: reparte en dos ejes para no
+   desbordar en espacios muy chicos.
 
 **Widgets compartidos** (`lib/widgets/`):
 - `FeltBackground` / `WoodPanel` — fondo de paño y panel de madera, la base visual del tema.
-- `ScorePanel` — panel de un equipo/jugador: nombre, puntaje, chip de hito, botones +/-.
+- `ScorePanel` — panel de un equipo/jugador: nombre, puntaje, chip de hito, botones +/-. Las franjas
+  del botón `−` y del puntaje se dimensionan como fracción del ancho del panel (con `clamp`), no
+  fijas: con 64 + 96 px fijos, un panel de la grilla 2x2 en teléfono se quedaba sin lugar para los
+  fósforos y desbordaba. Si el panel es angosto y el nombre sigue siendo el de fábrica, se muestra
+  `spec.nombresCortos` (`J#1`); un nombre puesto por el usuario no se abrevia nunca.
 - `GameHeader` — título de la partida + botón de reinicio.
 - `NameDialog` — diálogo para renombrar.
 - `MatchstickCounter` — dibuja el puntaje como fósforos (`CustomPainter`): grupos de 5, 4 lados de un
@@ -93,6 +129,10 @@ volvería a producir el mismo bug de clipping.
 - Tipografía: `mesaTheme()` define un único `textTheme` (Alegreya / Alegreya Sans vía `google_fonts`)
   y el resto del código usa `Theme.of(context).textTheme.<estilo>` — no hay `GoogleFonts.alegreya(...)`
   explícito repartido por los widgets.
+- `mesaTheme()` fuerza `splashFactory: InkRipple.splashFactory`: el `InkSparkle` que Material 3 usa
+  por defecto pinta con el fragment shader `shaders/ink_sparkle.frag`, que el runner de
+  `flutter test` no puede compilar (el asset del SDK trae solo stages Vulkan y el runner usa SkSL),
+  así que cualquier toque en un botón tiraba una excepción en los tests. **No sacar esa línea.**
 - Los diálogos usan `RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))` (vía
   `dialogTheme` en `mesaTheme()`).
 
