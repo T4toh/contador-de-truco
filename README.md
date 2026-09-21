@@ -33,7 +33,7 @@ Pensada para apoyar el celular en la mesa y tocar la pantalla mientras se juega.
 
 - Tocá una celda para cargarla: la app ofrece solo los valores válidos de esa casilla (tachar,
   20 o 25 servida, etc.). Tocar una celda cargada permite corregir o borrar.
-- Mantené apretado el nombre para renombrar.
+- Tocá el nombre (o mantenelo apretado) para renombrar.
 - Puntaje según el [reglamento de Ruibal](https://ruibalgames.com/wp-content/uploads/2015/11/Reglamento-Generala.pdf):
   generala 60, servida gana la partida. Sin doble generala ni bonus.
 

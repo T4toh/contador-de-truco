@@ -79,6 +79,13 @@ void main() {
 
   testWidgets('mantener el nombre lo renombra', (tester) async {
     await _montar(tester);
+    await tester.tap(find.text('Jugador 1'));
+    await tester.pumpAndSettle();
+    expect(find.text('Nombre del jugador'), findsOneWidget);
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.edit), findsNWidgets(3));
+
     await tester.longPress(find.text('Jugador 2'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextFormField), 'Flor');

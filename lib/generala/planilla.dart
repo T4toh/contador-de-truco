@@ -9,7 +9,7 @@ import 'reglas.dart';
 const _anchoColumnaLarga = 72.0;
 
 /// La tabla: casillas en filas, jugadores en columnas, total abajo.
-/// Tocar una celda llama a [onCelda]; mantener un nombre, a [onRenombrar].
+/// Tocar una celda llama a [onCelda]; tocar o mantener un nombre, a [onRenombrar].
 class Planilla extends StatelessWidget {
   final GeneralaGame juego;
   final void Function(int jugador, Casilla casilla) onCelda;
@@ -66,14 +66,29 @@ class Planilla extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
+                onTap: () => onRenombrar(j),
                 onLongPress: () => onRenombrar(j),
-                child: Center(
-                  child: Text(
-                    _nombre(j, angosto),
-                    style: estilo,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        _nombre(j, angosto),
+                        style: estilo,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (!angosto) ...[
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.edit,
+                        size: 14,
+                        color: MesaColors.doradoClaro,
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ),
