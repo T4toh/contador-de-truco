@@ -5,7 +5,15 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-VERSION_COMPLETA=$(grep '^version:' pubspec.yaml | awk '{print $2}')   # 1.0.1+3
+TMPDIR_ERR=$(mktemp)
+trap 'rm -f "$TMPDIR_ERR"' EXIT
+
+if ! gh auth status >/dev/null 2>&1; then
+    echo "❌ gh no está autenticado (gh auth login). Sin eso no se pueden verificar el tag ni el versionCode publicado."
+    exit 1
+fi
+
+VERSION_COMPLETA=$(grep '^version:' pubspec.yaml | awk '{print $2}') || true   # 1.0.1+3
 VERSION=${VERSION_COMPLETA%%+*}                                          # 1.0.1
 BUILD=${VERSION_COMPLETA##*+}                                            # 3
 TAG="v$VERSION"
@@ -28,14 +36,30 @@ fi
 
 # El updater compara la versión semver, pero Android compara el versionCode:
 # si no sube, el instalador rechaza el APK aunque el tag sea mayor.
-BUILD_PUBLICADO=$(gh release download --pattern versionCode.txt -O - 2>/dev/null || true)
+set +e
+BUILD_PUBLICADO=$(gh release download --pattern versionCode.txt -O - 2>"$TMPDIR_ERR")
+DESCARGA_OK=$?
+set -e
+if [ "$DESCARGA_OK" -ne 0 ]; then
+    if grep -q "no assets match" "$TMPDIR_ERR"; then
+        echo "⚠️  El último release no tiene versionCode.txt: no se puede verificar el bump del versionCode."
+        BUILD_PUBLICADO=""
+    else
+        echo "❌ No se pudo consultar el último release:"
+        cat "$TMPDIR_ERR"
+        exit 1
+    fi
+fi
+BUILD_PUBLICADO=$(echo "$BUILD_PUBLICADO" | tr -d '[:space:]')
 if [ -n "$BUILD_PUBLICADO" ]; then
+    if ! [[ "$BUILD_PUBLICADO" =~ ^[0-9]+$ ]]; then
+        echo "❌ versionCode.txt del último release no es un número: '$BUILD_PUBLICADO'"
+        exit 1
+    fi
     if [ "$BUILD" -le "$BUILD_PUBLICADO" ]; then
         echo "❌ versionCode $BUILD no es mayor que el publicado ($BUILD_PUBLICADO). Subí el +N en pubspec.yaml."
         exit 1
     fi
-else
-    echo "⚠️  El último release no tiene versionCode.txt: no se puede verificar el bump del versionCode."
 fi
 
 ./build_apk.sh
