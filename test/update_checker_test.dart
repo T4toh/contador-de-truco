@@ -134,4 +134,12 @@ void main() {
     expect(await checker.check(), isNull);
     expect(f.llamadas, isEmpty);
   });
+
+  test('apkUrl que no es https → null', () async {
+    final http = _release.replaceFirst(
+        'https://example.com/app.apk', 'http://example.com/app.apk');
+    final checker = UpdateChecker(
+        versionActual: '1.0.0', fetch: fetchFalso(http).fetch, ahora: () => ahora);
+    expect(await checker.check(), isNull);
+  });
 }

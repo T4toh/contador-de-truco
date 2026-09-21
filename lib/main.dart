@@ -81,11 +81,15 @@ class _HomeScreenState extends State<HomeScreen> {
               onCerrar: () => setState(() => _update = null),
             ),
           Expanded(
-            child: IndexedStack(
-              index: _seleccionado,
-              children: [
-                for (final spec in catalogo) CounterScreen(spec: spec),
-              ],
+            child: MediaQuery.removePadding(
+              context: context,
+              removeTop: update != null,
+              child: IndexedStack(
+                index: _seleccionado,
+                children: [
+                  for (final spec in catalogo) CounterScreen(spec: spec),
+                ],
+              ),
             ),
           ),
         ],

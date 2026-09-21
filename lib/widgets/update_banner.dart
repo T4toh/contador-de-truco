@@ -6,7 +6,7 @@ import '../theme/mesa_colors.dart';
 import '../update/update_info.dart';
 import '../update/updater_channel.dart';
 
-enum _Fase { aviso, sinPermiso, descargando, verificando, error }
+enum _Fase { aviso, sinPermiso, descargando, verificando, listo, error }
 
 /// Aviso de versión nueva, arriba del tablero. No es modal: no interrumpe
 /// una partida. Orquesta permiso → descarga → verificación → instalador.
@@ -34,6 +34,7 @@ class _UpdateBannerState extends State<UpdateBanner>
   int? _downloadId;
   Timer? _timer;
   bool _consultando = false;
+  bool _actualizando = false;
 
   @override
   void initState() {
@@ -57,6 +58,12 @@ class _UpdateBannerState extends State<UpdateBanner>
   }
 
   Future<void> _actualizar() async {
+    // Sin esta guarda, un doble tap en "Actualizar"/"Reintentar" (o dos
+    // "resumed" seguidos volviendo de Ajustes) corre el método dos veces en
+    // paralelo y encola dos descargas al mismo update.apk: la segunda borra
+    // el archivo de la primera.
+    if (_actualizando) return;
+    _actualizando = true;
     try {
       if (!await widget.canal.canRequestInstall()) {
         _cambiar(_Fase.sinPermiso);
@@ -69,6 +76,34 @@ class _UpdateBannerState extends State<UpdateBanner>
       _timer = Timer.periodic(const Duration(seconds: 1), (_) => _consultar());
     } catch (e) {
       _fallar('La descarga falló.');
+    } finally {
+      _actualizando = false;
+    }
+  }
+
+  /// Verifica el hash y dispara el instalador de Android sobre la descarga
+  /// ya encolada. La usan tanto el fin de la descarga como el botón
+  /// "Instalar" de la fase `listo` (el usuario canceló el instalador, o
+  /// Android lo rechazó por firma, y hay que poder reintentar sin volver a
+  /// descargar).
+  Future<void> _instalar() async {
+    final id = _downloadId;
+    if (id == null) return;
+    _cambiar(_Fase.verificando);
+    final ok = await widget.canal.verifyAndInstall(id, widget.info.sha256);
+    if (!mounted) return;
+    if (ok) {
+      _cambiar(_Fase.listo);
+    } else {
+      _fallar('La descarga se corrompió, probá de nuevo.');
+    }
+  }
+
+  Future<void> _abrirAjustes() async {
+    try {
+      await widget.canal.openInstallSettings();
+    } catch (e) {
+      _fallar('No se pudo abrir Ajustes.');
     }
   }
 
@@ -87,11 +122,7 @@ class _UpdateBannerState extends State<UpdateBanner>
       switch (d.estado) {
         case EstadoDescarga.exitosa:
           _timer?.cancel();
-          _cambiar(_Fase.verificando);
-          final ok = await widget.canal.verifyAndInstall(id, widget.info.sha256);
-          if (!mounted) return;
-          if (!ok) _fallar('La descarga se corrompió, probá de nuevo.');
-          // Si ok, la pantalla ahora es la del instalador de Android.
+          await _instalar();
         case EstadoDescarga.fallida:
           _fallar('La descarga falló.');
         case EstadoDescarga.pendiente:
@@ -148,7 +179,7 @@ class _UpdateBannerState extends State<UpdateBanner>
                         'para Contador de Truco.',
                         style: estilo)),
                 FilledButton(
-                    onPressed: widget.canal.openInstallSettings,
+                    onPressed: _abrirAjustes,
                     child: const Text('Abrir Ajustes')),
               ]),
             _Fase.descargando || _Fase.verificando => Column(
@@ -171,6 +202,18 @@ class _UpdateBannerState extends State<UpdateBanner>
                   ),
                 ],
               ),
+            _Fase.listo => Row(children: [
+                Expanded(
+                    child: Text('Actualización lista para instalar.',
+                        style: estilo)),
+                FilledButton(
+                    onPressed: _instalar, child: const Text('Instalar')),
+                IconButton(
+                  tooltip: 'Ahora no',
+                  icon: const Icon(Icons.close, color: MesaColors.crema),
+                  onPressed: widget.onCerrar,
+                ),
+              ]),
             _Fase.error => Row(children: [
                 Expanded(child: Text(_error, style: estilo)),
                 FilledButton(

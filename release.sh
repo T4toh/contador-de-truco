@@ -23,6 +23,11 @@ if [ "$VERSION_COMPLETA" = "$VERSION" ]; then
     exit 1
 fi
 
+if ! [[ "$BUILD" =~ ^[0-9]+$ ]]; then
+    echo "❌ El build number de pubspec.yaml no es un número: '$BUILD'"
+    exit 1
+fi
+
 if [ ! -f android/key.properties ]; then
     echo "❌ Falta android/key.properties: el APK saldría firmado con el keystore de debug"
     echo "   y Android lo rechazaría como actualización (INSTALL_FAILED_UPDATE_INCOMPATIBLE)."

@@ -128,6 +128,17 @@ void main() {
     expect(verify.arguments, {'id': 7, 'sha256': 'abc'});
     // Después de instalar el timer quedó cancelado: el test termina sin
     // "A Timer is still pending".
+
+    expect(find.text('Actualización lista para instalar.'), findsOneWidget);
+    expect(find.text('Instalar'), findsOneWidget);
+
+    await tester.tap(find.text('Instalar'));
+    await tester.pumpAndSettle();
+
+    final verifies =
+        llamadas.where((c) => c.method == 'verifyAndInstall').toList();
+    expect(verifies, hasLength(2));
+    expect(verifies.last.arguments, {'id': 7, 'sha256': 'abc'});
   });
 
   testWidgets('SHA-256 que no coincide avisa y ofrece reintentar',
@@ -215,6 +226,68 @@ void main() {
         llamadas.where((c) => c.method == 'verifyAndInstall').length, 1);
     expect(
         llamadas.where((c) => c.method == 'queryDownload').length, 1);
+  });
+
+  testWidgets('doble tap en Actualizar no encola dos descargas',
+      (tester) async {
+    // canRequestInstall tarda 500ms en responder: dos taps antes de que
+    // resuelva, sin la guarda, arrancarían dos _actualizar en paralelo y
+    // encolarían dos descargas.
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(UpdaterChannel.canal, (call) async {
+      llamadas.add(call);
+      switch (call.method) {
+        case 'canRequestInstall':
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+          return true;
+        case 'enqueueDownload':
+          return 7;
+        case 'queryDownload':
+          return {'status': 'failed', 'bytesSoFar': 0, 'bytesTotal': -1};
+        case 'verifyAndInstall':
+          return true;
+      }
+      return null;
+    });
+    await montar(tester);
+
+    await tester.tap(find.text('Actualizar'));
+    await tester.pump();
+    await tester.tap(find.text('Actualizar'));
+    await tester.pump();
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+
+    expect(
+        llamadas.where((c) => c.method == 'enqueueDownload').length, 1);
+    // Deja el timer cancelado: la descarga resolvió "failed".
+    expect(find.text('La descarga falló.'), findsOneWidget);
+  });
+
+  testWidgets(
+      'Ajustes que tira PlatformException muestra error, no queda colgado',
+      (tester) async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(UpdaterChannel.canal, (call) async {
+      llamadas.add(call);
+      switch (call.method) {
+        case 'canRequestInstall':
+          return false;
+        case 'openInstallSettings':
+          throw PlatformException(code: 'x');
+      }
+      return null;
+    });
+    await montar(tester);
+
+    await tester.tap(find.text('Actualizar'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Abrir Ajustes'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No se pudo abrir Ajustes.'), findsOneWidget);
   });
 
   testWidgets(

@@ -57,6 +57,10 @@ class UpdateChecker {
       final json = jsonDecode(cuerpo) as Map<String, dynamic>;
       final info = UpdateInfo.fromReleaseJson(json);
       if (info == null || !(info.version > local)) return null;
+      if (info.apkUrl.scheme != 'https') {
+        debugPrint('Updater: apkUrl no es https: ${info.apkUrl}');
+        return null;
+      }
       return info;
     } catch (e) {
       debugPrint('Updater: no se pudo chequear la release: $e');

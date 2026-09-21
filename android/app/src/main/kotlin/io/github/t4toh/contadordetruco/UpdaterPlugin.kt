@@ -9,6 +9,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
@@ -64,7 +65,10 @@ class UpdaterPlugin(private val context: Context) : MethodChannel.MethodCallHand
                     .setTitle("Contador de Truco")
                     .setDescription("Descargando la actualización")
                     .setMimeType(MIME_APK)
-                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                    // VISIBLE_NOTIFY_COMPLETED, no VISIBLE: si el sistema mata la app
+                    // durante la descarga, la notificación al completar sigue ahí para
+                    // que el usuario pueda instalar igual.
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                     .setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, ARCHIVO)
                 result.success(downloadManager.enqueue(request))
             }
@@ -106,6 +110,8 @@ class UpdaterPlugin(private val context: Context) : MethodChannel.MethodCallHand
                         val uri = downloadManager.getUriForDownloadedFile(id)
                         ok = uri != null && sha256(uri) == esperado
                         if (ok) {
+                            // getUriForDownloadedFile devuelve content:// desde API 24; con
+                            // minSdk menor daría file:// y el instalador lo rechazaría.
                             context.startActivity(
                                 Intent(Intent.ACTION_VIEW)
                                     .setDataAndType(uri, MIME_APK)
@@ -117,6 +123,7 @@ class UpdaterPlugin(private val context: Context) : MethodChannel.MethodCallHand
                         }
                     } catch (e: Exception) {
                         // Sin instalador que abra el APK, o cualquier otra falla: no se instala nada.
+                        Log.w("Updater", "verifyAndInstall falló", e)
                         ok = false
                         runCatching { downloadManager.remove(id) }
                     } finally {
