@@ -33,6 +33,7 @@ class _UpdateBannerState extends State<UpdateBanner>
   double? _progreso;
   int? _downloadId;
   Timer? _timer;
+  bool _consultando = false;
 
   @override
   void initState() {
@@ -74,6 +75,12 @@ class _UpdateBannerState extends State<UpdateBanner>
   Future<void> _consultar() async {
     final id = _downloadId;
     if (id == null) return;
+    // El timer dispara cada 1 s sin esperar a que termine la consulta
+    // anterior. Sin esta guarda, un round trip lento (o el paso a
+    // "verificando" + "verifyAndInstall", que son dos awaits) puede solaparse
+    // con el siguiente tick y disparar dos instalaciones de una descarga.
+    if (_consultando) return;
+    _consultando = true;
     try {
       final d = await widget.canal.queryDownload(id);
       if (!mounted) return;
@@ -94,6 +101,8 @@ class _UpdateBannerState extends State<UpdateBanner>
       }
     } catch (e) {
       _fallar('La descarga falló.');
+    } finally {
+      _consultando = false;
     }
   }
 

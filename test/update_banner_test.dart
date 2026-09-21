@@ -174,10 +174,62 @@ void main() {
     expect(find.text('La descarga falló.'), findsOneWidget);
   });
 
-  testWidgets('HomeScreen sin plugin nativo arranca en silencio, sin banner',
+  testWidgets(
+      'un round trip lento no dispara dos instalaciones desde dos ticks',
       (tester) async {
-    // Sin mock del canal: MissingPluginException, atrapada en HomeScreen.
+    // queryDownload tarda 1.5s en responder "successful". El timer sigue
+    // tickeando cada 1s mientras tanto: sin la guarda de re-entrada, el
+    // segundo tick arrancaría su propio queryDownload/verifyAndInstall antes
+    // de que el primero termine.
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(UpdaterChannel.canal, (call) async {
+      llamadas.add(call);
+      switch (call.method) {
+        case 'canRequestInstall':
+          return true;
+        case 'enqueueDownload':
+          return 7;
+        case 'queryDownload':
+          await Future<void>.delayed(const Duration(milliseconds: 1500));
+          return {'status': 'successful', 'bytesSoFar': 100, 'bytesTotal': 100};
+        case 'verifyAndInstall':
+          return true;
+      }
+      return null;
+    });
+    await montar(tester);
+
+    await tester.tap(find.text('Actualizar'));
+    await tester.pump();
+
+    // t=1s: primer tick, arranca el queryDownload demorado.
+    await tester.pump(const Duration(seconds: 1));
+    // t=2s: segundo tick. Sin la guarda arrancaría un segundo queryDownload
+    // (el primero recién responde en t=2.5s); con la guarda, no hace nada.
+    await tester.pump(const Duration(seconds: 1));
+    // t=3s: para cuando se llega acá, el primer queryDownload ya respondió
+    // (t=2.5s) y verifyAndInstall ya se llamó.
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(
+        llamadas.where((c) => c.method == 'verifyAndInstall').length, 1);
+    expect(
+        llamadas.where((c) => c.method == 'queryDownload').length, 1);
+  });
+
+  testWidgets(
+      'HomeScreen con el canal fallando arranca en silencio, sin banner',
+      (tester) async {
+    // El canal está mockeado pero responde con un error en cada llamada: a
+    // diferencia de no mockear nada (donde el mensaje queda bufferizado sin
+    // resolver nunca en testWidgets, ver task-5-report.md), acá la excepción
+    // se lanza y se espera que _chequearUpdate la atrape de verdad.
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(UpdaterChannel.canal, (call) async {
+      throw PlatformException(code: 'sin_plugin');
+    });
     await tester.pumpWidget(const ContadorDeTrucoApp());
+    await tester.pump();
     await tester.pump();
 
     expect(find.byType(UpdateBanner), findsNothing);
