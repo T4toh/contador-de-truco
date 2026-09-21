@@ -2,7 +2,9 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:contador_de_truco/generala/generala_game.dart';
+import 'package:contador_de_truco/generala/generala_storage.dart';
 import 'package:contador_de_truco/generala/reglas.dart';
 
 void main() {
@@ -150,5 +152,27 @@ void main() {
       isNull,
       reason: 'una fila corta',
     );
+  });
+
+  test('storage guarda y carga bajo generala_partida', () async {
+    SharedPreferences.setMockInitialValues({});
+    final g = GeneralaGame.nueva()..empezar(3);
+    g.anotar(1, Casilla.full, Casilla.full.opciones[1]);
+    await GeneralaStorage().guardar(g);
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('generala_partida'), isNotNull);
+
+    final cargado = await GeneralaStorage().cargar();
+    expect(cargado.participantes, 3);
+    expect(cargado.total(1), 30);
+    expect(cargado.empezada, isTrue);
+  });
+
+  test('storage con basura guardada arranca una partida nueva', () async {
+    SharedPreferences.setMockInitialValues({'generala_partida': '{rota'});
+    final cargado = await GeneralaStorage().cargar();
+    expect(cargado.empezada, isFalse);
+    expect(cargado.participantes, 2);
   });
 }
