@@ -105,7 +105,12 @@ class _CounterScreenState extends State<CounterScreen> {
                 titulo: _tituloPartida(),
                 onReiniciar: _volverAlSetup,
               ),
-              Expanded(child: _tablero(orientacion)),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, restricciones) =>
+                      _tablero(orientacion, restricciones.maxHeight),
+                ),
+              ),
             ],
           ),
         ),
@@ -116,8 +121,12 @@ class _CounterScreenState extends State<CounterScreen> {
   String _tituloPartida() =>
       widget.spec.eligeTope ? 'Partida a ${_juego.tope}' : widget.spec.titulo;
 
-  Widget _tablero(Orientation orientacion) {
-    final filas = layoutFor(_juego.participantes, orientacion);
+  Widget _tablero(Orientation orientacion, double alto) {
+    final filas = layoutFor(
+      _juego.participantes,
+      orientacion,
+      altoDisponible: alto,
+    );
     return Column(
       children: filas
           .map((fila) => Expanded(

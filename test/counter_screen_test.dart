@@ -319,4 +319,47 @@ void main() {
     expect(find.text('Tato'), findsOneWidget);
     expect(find.text('J#1'), findsNothing);
   });
+
+  testWidgets('la Escoba a 4 en un tablero bajo pasa a una fila y nada se clipea',
+      (tester) async {
+    // Landscape de teléfono con la NavigationBar y los insets del sistema
+    // ya descontados: con la grilla 2x2, cada panel quedaba en ~78 px y el
+    // puntaje, los fósforos y el botón − desaparecían.
+    tester.view.physicalSize = const Size(986, 300);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    SharedPreferences.setMockInitialValues(escobaA4());
+    await tester.pumpWidget(
+      MaterialApp(theme: mesaTheme(), home: CounterScreen(spec: escoba)),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+
+    final paneles = find.byType(ScorePanel);
+    expect(paneles, findsNWidgets(4));
+
+    // Una sola fila: los cuatro paneles arrancan al mismo alto.
+    // Los cuatro Text('−') son idénticos, así que hay que ir por índice:
+    // find.byWidget() no los distingue.
+    final topes = <int>{};
+    for (var i = 0; i < 4; i++) {
+      topes.add(tester.getTopLeft(paneles.at(i)).dy.round());
+
+      // El botón − sigue dibujándose dentro de la pantalla.
+      final rect = tester.getRect(find.text('−').at(i));
+      expect(rect.height, greaterThan(0), reason: 'botón $i');
+      expect(rect.bottom, lessThanOrEqualTo(300), reason: 'botón $i');
+    }
+    expect(topes.length, 1, reason: 'los cuatro en la misma fila');
+
+    // Y los fósforos del que tiene puntaje siguen dibujándose.
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is CustomPaint && w.painter is MatchstickGroupPainter,
+      ),
+      findsWidgets,
+    );
+    expect(find.text('14'), findsOneWidget);
+  });
 }

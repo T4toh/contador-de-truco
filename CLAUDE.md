@@ -43,7 +43,8 @@ subirlo en cada release.
 ## Arquitectura
 
 App Flutter de contadores de puntaje para juegos de cartas argentinos. Sin backend, sin state
-management externo, sin assets: todo `StatefulWidget` + `setState` + `CustomPainter`.
+management externo: todo `StatefulWidget` + `setState` + `CustomPainter`. El único asset son las
+tipografías (`assets/fonts/`).
 
 **Shell** — `lib/main.dart`: `main()` corre la migración de `GameStorage` una sola vez, antes de
 `runApp`, envuelta en `try/catch` (si falla, se pierde la partida vieja pero la app abre igual —
@@ -112,8 +113,11 @@ Hay tres caminos, en este orden:
 - **Truco** (`catalog.dart`): tope 15 ("A MALAS") o 30 ("A BUENAS"), 2 participantes fijos. Con tope
   30, el `Hito` dispara en 15: cambia el aspecto del panel y el chip pasa de `EN LAS MALAS` a
   `EN LAS BUENAS` (`ScoreGame.cruzoElHito`). Nombres por defecto `Nosotros` / `Ellos`.
-- **Escoba del 15**: tope fijo 15, 2 a 4 participantes. Con 4, `panel_layout.dart` siempre arma grilla
-  2x2 sin importar la orientación; con 2 o 3 depende de la orientación (`layoutFor`).
+- **Escoba del 15**: tope fijo 15, 2 a 4 participantes. Con 4, `panel_layout.dart` arma grilla 2x2
+  si el tablero tiene alto para dos filas (`altoDisponible >= altoMinimoPanel * 2`); si no —landscape
+  de teléfono— los pone en una sola fila, porque con la grilla cada panel quedaba en ~78 px y el
+  puntaje, los fósforos y el botón `−` desaparecían clipeados. Con 2 o 3 depende de la orientación
+  (`layoutFor`).
 - Los puntajes se hacen `.clamp(0, tope)` en `ScoreGame.sumar`, así que restar nunca va a negativo ni
   sumar pasa del tope.
 
@@ -126,9 +130,14 @@ Hay tres caminos, en este orden:
   `Theme.of(context).colorScheme` ni `Colors.*` directo) — ver `lib/theme/mesa_colors.dart`. Dentro de
   un `CustomPainter` (los fósforos), el sombreado procedural queda literal (`Colors.white.withValues`,
   gradientes con `Color(0x...)` puntuales) porque ahí se está simulando luz, no pintando UI.
-- Tipografía: `mesaTheme()` define un único `textTheme` (Alegreya / Alegreya Sans vía `google_fonts`)
-  y el resto del código usa `Theme.of(context).textTheme.<estilo>` — no hay `GoogleFonts.alegreya(...)`
-  explícito repartido por los widgets.
+- Tipografía: `mesaTheme()` define un único `textTheme` (Alegreya / Alegreya Sans) y el resto del
+  código usa `Theme.of(context).textTheme.<estilo>` — no hay `TextStyle(fontFamily: ...)` suelto
+  repartido por los widgets. Las fuentes van **empaquetadas** en `assets/fonts/`, declaradas en la
+  sección `fonts:` de `pubspec.yaml`. **No volver a `google_fonts`**: baja las fuentes de
+  `fonts.googleapis.com` en runtime, y el APK de release no tiene permiso de `INTERNET` —Flutter
+  solo lo declara en los manifiestos de `debug` y `profile`—, así que la descarga fallaba en
+  silencio y la app en release se veía entera en Roboto. Los `.ttf` son OFL; las licencias están en
+  `assets/fonts/OFL-*.txt`.
 - `mesaTheme()` fuerza `splashFactory: InkRipple.splashFactory`: el `InkSparkle` que Material 3 usa
   por defecto pinta con el fragment shader `shaders/ink_sparkle.frag`, que el runner de
   `flutter test` no puede compilar (el asset del SDK trae solo stages Vulkan y el runner usa SkSL),
