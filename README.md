@@ -142,8 +142,8 @@ de tab no pierde la partida del otro juego.
 - **Generala**: las reglas están en `docs/generala.md` pero no hay código. Su planilla de 13 casillas
   no encaja en el patrón "contador de puntos" de los otros dos juegos.
 - **Papa**: agregar el juego (reglas y contador).
-- **Reglas de todos los juegos**: `docs/` tiene Escoba y Generala; falta `docs/truco.md`, y cada
-  juego que se agregue tiene que entrar con sus reglas.
+- **Reglas de todos los juegos**: `docs/` tiene Truco, Escoba y Generala; cada juego que se agregue
+  tiene que entrar con sus reglas.
 - **Otros juegos**: investigar qué más se juega con dados o con cartas españolas y falta acá
   (chinchón, casita robada, siete y medio, cacho, etc.).
 - **Tirador de dados** de todas las caras (D4, D6, D8, D10, D12, D20). Para el final.
