@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _seleccionado = 0;
   final _canal = UpdaterChannel();
   UpdateInfo? _update;
+  String? _version;
 
   @override
   void initState() {
@@ -60,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _chequearUpdate() async {
     try {
       final version = await _canal.currentVersionName();
+      if (mounted) setState(() => _version = version);
       final info = await UpdateChecker(versionActual: version).check();
       if (info != null && mounted) setState(() => _update = info);
     } catch (e) {
@@ -87,7 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: IndexedStack(
                 index: _seleccionado,
                 children: [
-                  for (final spec in catalogo) CounterScreen(spec: spec),
+                  for (final spec in catalogo)
+                  CounterScreen(spec: spec, version: _version),
                 ],
               ),
             ),

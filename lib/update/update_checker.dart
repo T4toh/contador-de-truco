@@ -56,7 +56,14 @@ class UpdateChecker {
       final cuerpo = await _fetch(Uri.parse(releaseUrl));
       final json = jsonDecode(cuerpo) as Map<String, dynamic>;
       final info = UpdateInfo.fromReleaseJson(json);
-      if (info == null || !(info.version > local)) return null;
+      if (info == null) {
+        debugPrint('Updater: la release no trae un .apk con digest');
+        return null;
+      }
+      if (!(info.version > local)) {
+        debugPrint('Updater: sin novedades (${info.version} vs $local)');
+        return null;
+      }
       if (info.apkUrl.scheme != 'https') {
         debugPrint('Updater: apkUrl no es https: ${info.apkUrl}');
         return null;

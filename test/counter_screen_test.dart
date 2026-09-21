@@ -9,6 +9,7 @@ import 'package:contador_de_truco/widgets/score_panel.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  _versionTests();
 
   testWidgets('no hay overflow en landscape de celular (Truco y Escoba)',
       (tester) async {
@@ -361,5 +362,31 @@ void main() {
       findsWidgets,
     );
     expect(find.text('14'), findsOneWidget);
+  });
+}
+
+void _versionTests() {
+  testWidgets('el setup muestra la versión abajo a la derecha, y nada si es null',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(MaterialApp(
+      theme: mesaTheme(),
+      home: const CounterScreen(spec: truco, version: '1.0.1'),
+    ));
+    await tester.pump();
+    expect(find.text('v1.0.1'), findsOneWidget);
+
+    // Al empezar la partida la etiqueta desaparece: no molesta jugando.
+    await tester.tap(find.text('A MALAS'));
+    await tester.pump();
+    expect(find.text('v1.0.1'), findsNothing);
+
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(MaterialApp(
+      theme: mesaTheme(),
+      home: const CounterScreen(key: ValueKey('sin'), spec: truco),
+    ));
+    await tester.pump();
+    expect(find.textContaining('v1.'), findsNothing);
   });
 }
