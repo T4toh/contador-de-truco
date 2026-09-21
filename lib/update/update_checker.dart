@@ -15,7 +15,7 @@ typedef Fetch = Future<String> Function(Uri url);
 /// Nunca lanza: cualquier falla (sin red, rate limit, JSON raro) es `null`.
 class UpdateChecker {
   static const releaseUrl =
-      'https://api.github.com/repos/T4toh/contador-de-truco/releases/latest';
+      'https://api.github.com/repos/T4toh/pulpero/releases/latest';
   static const claveUltimoChequeo = 'update_last_check';
   static const intervalo = Duration(hours: 24);
 
@@ -81,7 +81,7 @@ class UpdateChecker {
       ..connectionTimeout = const Duration(seconds: 10);
     try {
       final req = await cliente.getUrl(url);
-      req.headers.set(HttpHeaders.userAgentHeader, 'contador-de-truco');
+      req.headers.set(HttpHeaders.userAgentHeader, 'pulpero');
       req.headers.set(HttpHeaders.acceptHeader, 'application/vnd.github+json');
       final res = await req.close().timeout(const Duration(seconds: 15));
       if (res.statusCode != 200) {
