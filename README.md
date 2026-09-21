@@ -1,4 +1,4 @@
-# 🃏 Contador de Truco
+# 🃏 Pulpero
 
 App de **Flutter** para llevar el puntaje de juegos de cartas argentinos. Sin backend, sin cuentas,
 sin assets externos: todo se dibuja con widgets nativos de Flutter y `CustomPainter`.
@@ -137,8 +137,6 @@ de tab no pierde la partida del otro juego.
 
 ## 🛠️ Pendientes conocidos
 
-- **Nombre**: "Contador de Truco" ya quedó chico con Escoba adentro y más juegos en camino.
-  Pensar uno mejor antes de que la app circule más.
 - **Generala**: las reglas están en `docs/generala.md` pero no hay código. Su planilla de 13 casillas
   no encaja en el patrón "contador de puntos" de los otros dos juegos.
 - **Papa**: agregar el juego (reglas y contador).

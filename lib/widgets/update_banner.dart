@@ -176,7 +176,7 @@ class _UpdateBannerState extends State<UpdateBanner>
                 Expanded(
                     child: Text(
                         'Para actualizar, habilitá "Instalar apps desconocidas" '
-                        'para Contador de Truco.',
+                        'para Pulpero.',
                         style: estilo)),
                 FilledButton(
                     onPressed: _abrirAjustes,

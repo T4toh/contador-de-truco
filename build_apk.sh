@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🔨 Construyendo APK de Contador de Truco..."
+echo "🔨 Construyendo APK de Pulpero..."
 echo ""
 
 # Limpiar builds anteriores

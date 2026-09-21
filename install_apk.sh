@@ -3,7 +3,7 @@
 APK_PATH="build/app/outputs/flutter-apk/app-release.apk"
 PACKAGE_NAME="io.github.t4toh.contadordetruco"
 
-echo "📱 Instalando Contador de Truco en dispositivo Android..."
+echo "📱 Instalando Pulpero en dispositivo Android..."
 echo ""
 
 # Verificar si el APK existe
@@ -44,7 +44,7 @@ adb install "$APK_PATH"
 if [ $? -eq 0 ]; then
     echo ""
     echo "✅ App instalada exitosamente!"
-    echo "🎯 Puedes abrir 'Contador de Truco' desde tu dispositivo"
+    echo "🎯 Puedes abrir 'Pulpero' desde tu dispositivo"
     echo ""
     echo "🚀 ¿Quieres abrirla ahora? (s/n)"
     read -r response

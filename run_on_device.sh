@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Ejecutando Contador de Truco en modo debug..."
+echo "🚀 Ejecutando Pulpero en modo debug..."
 echo ""
 
 # Verificar si hay dispositivos conectados

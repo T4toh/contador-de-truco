@@ -6,7 +6,7 @@
     <!-- Updater: lanzar el instalador de Android con el APK descargado. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <application
-        android:label="contador_de_truco"
+        android:label="Pulpero"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

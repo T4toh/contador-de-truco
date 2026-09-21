@@ -30,7 +30,7 @@ class ContadorDeTrucoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Contador de Truco',
+      title: 'Pulpero',
       theme: mesaTheme(),
       home: const HomeScreen(),
     );

@@ -70,7 +70,7 @@ fi
 ./build_apk.sh
 
 SALIDA=build/app/outputs/flutter-apk
-APK="$SALIDA/contador-de-truco-$VERSION.apk"
+APK="$SALIDA/pulpero-$VERSION.apk"
 cp "$SALIDA/app-release.apk" "$APK"
 echo "$BUILD" > "$SALIDA/versionCode.txt"
 shasum -a 256 "$APK"
