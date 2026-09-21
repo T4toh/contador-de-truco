@@ -87,11 +87,15 @@ flutter test         # tests de widget
 ./run_on_device.sh   # verifica que haya un device por adb y corre en modo debug
 ./build_apk.sh       # clean + pub get + build apk --release
 ./install_apk.sh     # desinstala la versión anterior e instala el APK release
+./release.sh         # valida versión y firma, buildea e imprime el gh release create (no publica)
 ```
+
+La app se actualiza sola: al abrir consulta la última release de GitHub y, si hay una versión
+nueva, ofrece descargarla e instalarla desde un banner.
 
 ### Dependencias
 
-`shared_preferences` · `google_fonts` · `cupertino_icons` · `flutter_lints` (dev)
+`shared_preferences` · `cupertino_icons` · `flutter_lints` (dev). Las tipografías van empaquetadas en `assets/fonts/`.
 
 ---
 
@@ -133,25 +137,16 @@ de tab no pierde la partida del otro juego.
 
 ## 🛠️ Pendientes conocidos
 
+- **Nombre**: "Contador de Truco" ya quedó chico con Escoba adentro y más juegos en camino.
+  Pensar uno mejor antes de que la app circule más.
 - **Generala**: las reglas están en `docs/generala.md` pero no hay código. Su planilla de 13 casillas
   no encaja en el patrón "contador de puntos" de los otros dos juegos.
-- **Firma del APK**: los builds se firman con la clave de debug del template, así que un APK
-  compilado en otra máquina no puede actualizar al instalado — hay que desinstalar y perder la
-  partida guardada. Para poder repartir versiones nuevas sin eso, hace falta generar un keystore
-  propio y configurarlo en `android/app/build.gradle.kts`. Va de la mano con el punto anterior.
-- **Actualizar desde adentro de la app**: hoy la única forma de instalar una versión nueva es
-  compilar el APK y pasarlo por USB. Hay que buscar cómo hacerlo desde la app misma. Tres caminos,
-  de menor a mayor compromiso:
-  - **Chequear releases de GitHub**: la app consulta la API de releases del repo, compara contra su
-    propia versión y, si hay una nueva, ofrece descargar el APK. Sin dependencias de tiendas, pero
-    requiere el permiso de instalar de orígenes desconocidos y que el usuario acepte cada vez.
-  - **Play Store**: publicar la app y dejar que la tienda resuelva las actualizaciones sola. Es lo
-    más cómodo para quien la usa, pero implica cuenta de desarrollador, revisión, y cambiar el
-    `applicationId` antes (ver el punto de arriba).
-  - **Shorebird** u otro sistema de *code push*: actualiza el código Dart sin reinstalar el APK.
-    Muy cómodo para arreglos chicos, pero no sirve para cambios que tocan código nativo o
-    dependencias, y suma un servicio externo del que la app pasa a depender.
-
+- **Papa**: agregar el juego (reglas y contador).
+- **Reglas de todos los juegos**: `docs/` tiene Escoba y Generala; falta `docs/truco.md`, y cada
+  juego que se agregue tiene que entrar con sus reglas.
+- **Otros juegos**: investigar qué más se juega con dados o con cartas españolas y falta acá
+  (chinchón, casita robada, siete y medio, cacho, etc.).
+- **Tirador de dados** de todas las caras (D4, D6, D8, D10, D12, D20). Para el final.
 - **Tests**: falta cubrir la planilla de ganador y el ida y vuelta completo de persistencia a través
   de la UI. Lo demás está: la lógica de puntaje en `test/score_game_test.dart`, las migraciones en
   `test/game_storage_test.dart`, y tocar, restar y renombrar en `test/counter_screen_test.dart`.
