@@ -66,16 +66,18 @@ sobre el canal `io.github.t4toh.contadordetruco/updater`:
 
 | Método | Devuelve | Notas |
 |---|---|---|
-| `currentVersionCode` | `int` | Vía `PackageManager`. Reemplaza a `package_info_plus`. |
-| `canRequestInstall` | `bool` | `packageManager.canRequestPackageInstalls()`. |
+| `currentVersionName` | `String` | Vía `PackageManager` (`versionName`, o sea `1.0.0`). Reemplaza a `package_info_plus`. |
+| `canRequestInstall` | `bool` | `packageManager.canRequestPackageInstalls()`. Es API 26+: con `Build.VERSION.SDK_INT < 26` devuelve `true`, porque ahí el permiso de "orígenes desconocidos" es global y lo pide el propio instalador. |
 | `openInstallSettings` | `void` | Intent `ACTION_MANAGE_UNKNOWN_APP_SOURCES` con el `applicationId`. |
 | `enqueueDownload(url)` | `long` (downloadId) | `DownloadManager.Request` con destino en `getExternalFilesDir(DIRECTORY_DOWNLOADS)`, nombre fijo `update.apk`. |
 | `queryDownload(id)` | `{status, bytesSoFar, bytesTotal}` | `DownloadManager.query()`. |
-| `verifyAndInstall(id, sha256)` | `bool` | Calcula el SHA-256 del archivo en un hilo de fondo; si coincide lanza el intent de instalación, si no borra el archivo y devuelve `false`. |
+| `verifyAndInstall(id, sha256)` | `bool` | Abre el archivo vía `contentResolver.openInputStream(uri)` y calcula el SHA-256 en un hilo de fondo; si coincide lanza el intent de instalación, si no llama a `DownloadManager.remove(id)` y devuelve `false`. |
 
 El intent de instalación es `ACTION_VIEW` con `setDataAndType(uri, "application/vnd.android.package-archive")`
-y los flags `FLAG_GRANT_READ_URI_PERMISSION` y `FLAG_ACTIVITY_NEW_TASK`, sobre una URI de
-`FileProvider`.
+y los flags `FLAG_GRANT_READ_URI_PERMISSION` y `FLAG_ACTIVITY_NEW_TASK`, sobre la URI
+`content://downloads/...` que devuelve `DownloadManager.getUriForDownloadedFile(id)`. No hace
+falta un `FileProvider` propio: el `DownloadManager` ya es un content provider y el instalador
+puede leer de ahí.
 
 ### Manifest
 
@@ -83,8 +85,8 @@ En `android/app/src/main/AndroidManifest.xml`:
 
 - `<uses-permission android:name="android.permission.INTERNET"/>`
 - `<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>`
-- Un `<provider>` de `FileProvider` con autoridad `io.github.t4toh.contadordetruco.fileprovider`
-  y `android/app/src/main/res/xml/filepaths.xml` exponiendo `<external-files-path>`.
+
+Nada más: sin `<provider>` ni `res/xml`.
 
 ## Flujo
 
@@ -95,8 +97,8 @@ En `android/app/src/main/AndroidManifest.xml`:
 3. `GET https://api.github.com/repos/T4toh/contador-de-truco/releases/latest`. Del JSON salen
    `tag_name` y, del asset `.apk`, su `browser_download_url` y su campo `digest`
    (`"sha256:954c2b…"`, que la API ya expone).
-4. Se parsea el build number del tag y se compara con `currentVersionCode`. Si no es mayor, no
-   pasa nada. Se guarda el timestamp igual.
+4. Se parsea el semver del tag (`v1.0.1` → `1.0.1`) y se compara componente a componente con
+   `currentVersionName`. Si no es mayor, no pasa nada. Se guarda el timestamp igual.
 5. Si es mayor, aparece el `UpdateBanner` arriba del `IndexedStack` de `HomeScreen`. No es
    modal y no interrumpe una partida en curso.
 6. Al tocar "Actualizar": si `canRequestInstall` es `false`, el botón manda a Ajustes con una
@@ -108,15 +110,22 @@ En `android/app/src/main/AndroidManifest.xml`:
 
 ## Versionado
 
-`pubspec.yaml` es la única fuente de verdad. Los tags pasan a tener el formato
-`v<version>+<build>` — el próximo release es `v1.0.1+3`.
+`pubspec.yaml` es la única fuente de verdad. El tag es `v<version>` (la parte antes del `+`):
+el próximo release es `v1.0.1`, con `version: 1.0.1+3` en `pubspec.yaml`.
 
-El updater parsea el número después del `+`. Los tags viejos (`v0.0.1`, `v0.0.2`) no parsean y
-se ignoran, así que no hay que borrar ni renombrar nada: el primer release con el formato nuevo
-es el que empieza a funcionar.
+El updater compara semver contra el `versionName` instalado. Los tags viejos (`v0.0.1`,
+`v0.0.2`) parsean bien y quedan por debajo de cualquier versión nueva, así que no hay que borrar
+ni renombrar nada. Un tag que no parsee como `vX.Y.Z` se ignora.
 
-Se agrega un `release.sh` que lee la versión de `pubspec.yaml`, verifica que exista
-`android/key.properties` antes de buildear, y arma el comando de `gh release create`.
+Android, en cambio, compara `versionCode` (el número después del `+`): si no se sube, el
+instalador rechaza la actualización aunque el tag sea mayor. Ese chequeo va en el script de
+release, no en el updater.
+
+Se agrega un `release.sh` que lee `version` de `pubspec.yaml`, verifica que exista
+`android/key.properties`, verifica que el tag `v<version>` no exista todavía y que el `+build`
+sea mayor al del último release publicado (lo lee de un asset `versionCode.txt` que el mismo
+script sube junto al APK; si el último release no lo tiene, solo avisa), buildea con
+`build_apk.sh`, y arma el comando de `gh release create`.
 **El script no publica solo**: imprime el comando para que lo corra una persona. Publicar un tag
 es una acción que decide el usuario, no el agente.
 
@@ -135,9 +144,10 @@ es una acción que decide el usuario, no el agente.
 
 `flutter test`, sobre `UpdateChecker` con el JSON inyectado:
 
-- Release con build mayor que el local → hay update.
-- Release con build igual o menor → no hay update.
-- Tag que no parsea (`v0.0.2`) → no hay update.
+- Tag con semver mayor que el local (`v1.0.1` vs `1.0.0`) → hay update.
+- Tag igual o menor (`v1.0.0`, `v0.0.2`) → no hay update.
+- Tag que no parsea (`latest`, `v1.0`) → no hay update.
+- Comparación numérica, no lexicográfica: `v1.0.10` > `v1.0.9`.
 - JSON sin asset `.apk` → no hay update.
 - Último chequeo hace menos de 24 h → no toca la red.
 - Último chequeo hace más de 24 h → consulta y actualiza el timestamp.
