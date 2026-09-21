@@ -12,6 +12,7 @@ flutter test                         # todos los tests
 flutter test test/widget_test.dart --plain-name 'Truco tab shows game mode selection'   # un test
 ./build_apk.sh                       # flutter clean + pub get + build apk --release
 ./install_apk.sh                     # adb uninstall + install del APK release
+./release.sh                         # valida versión y firma, buildea e imprime el gh release create (no publica)
 ```
 
 Sin Android SDK ni Chrome disponibles, la verificación visual se hace con
@@ -39,6 +40,29 @@ de una instalación existente.
 El `versionCode` sale de `flutter.versionCode`, o sea del `version:` de `pubspec.yaml` (`1.0.0+1`, el
 número después del `+`). Android solo acepta actualizar a un `versionCode` mayor, así que hay que
 subirlo en cada release.
+
+## Updater
+
+La app se actualiza sola desde GitHub Releases: `lib/update/` consulta
+`releases/latest` al abrir (como mucho una vez cada 24 h, gate en
+`SharedPreferences` bajo `update_last_check`), y si el tag es un semver mayor que el
+`versionName` instalado muestra `UpdateBanner` arriba del tablero. Al tocar
+"Actualizar", `UpdaterPlugin.kt` descarga el `.apk` con `DownloadManager`, verifica el
+SHA-256 contra el `digest` que expone la API de GitHub y lanza el instalador.
+
+- **Tags:** `v<version>` (`v1.0.1`), la parte de `pubspec.yaml` antes del `+`. Android
+  compara el `versionCode` (el `+N`), así que hay que subir los dos. `release.sh` verifica
+  el bump contra el asset `versionCode.txt` del release anterior.
+- **Assets del release:** el `.apk` (único asset que termina en `.apk`; el updater toma
+  el primero) y `versionCode.txt`.
+- **Permisos:** el manifest declara `INTERNET` y `REQUEST_INSTALL_PACKAGES`. En Xiaomi la
+  primera vez el banner manda a Ajustes ("Instalar apps desconocidas"); al volver a la
+  app arranca solo.
+- **Firma:** un APK firmado con otro keystore lo rechaza el instalador de Android
+  (`INSTALL_FAILED_UPDATE_INCOMPATIBLE`); la app no puede preverlo. Ver [Firma](#firma).
+- **Sin red o API caída:** silencio, `debugPrint` y reintento al día siguiente. Nunca un
+  diálogo al abrir.
+- El chequeo corre desde `HomeScreen`, nunca desde `main()`.
 
 ## Arquitectura
 
@@ -107,6 +131,7 @@ Hay tres caminos, en este orden:
 - `MatchstickCounter` — dibuja el puntaje como fósforos (`CustomPainter`): grupos de 5, 4 lados de un
   cuadrado más la diagonal.
 - `WinnerBottomSheet` — pantalla de ganador, recibe `onReset`.
+- `UpdateBanner` — aviso de versión nueva; orquesta permiso → descarga → SHA-256 → instalador.
 
 ## Reglas de juego codificadas
 
