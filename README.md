@@ -41,6 +41,8 @@ Pensada para apoyar el celular en la mesa y tocar la pantalla mientras se juega.
 
 ## 📱 Controles
 
+Vale para Truco y Escoba. Generala se carga tocando la celda, ver [Generala](#generala).
+
 | Acción | Cómo |
 | ------ | ---- |
 | Sumar 1 punto | **Tap** en cualquier parte del panel del equipo/jugador |
@@ -56,9 +58,9 @@ nunca pasa del tope.
 
 ## 🎨 Cómo se ven los puntos
 
-Los puntos se dibujan como **fósforos**, igual que anotando en un papel: cada grupo de 5 es un
-cuadrado de 4 fósforos más la diagonal. Está hecho con `CustomPainter` — no hay imágenes en el
-proyecto.
+En Truco y Escoba (Generala es una planilla, no un puntaje que sube). Los puntos se dibujan como
+**fósforos**, igual que anotando en un papel: cada grupo de 5 es un cuadrado de 4 fósforos más la
+diagonal. Está hecho con `CustomPainter` — no hay imágenes en el proyecto.
 
 El resto de la interfaz sigue el tema "paño y madera": fondo verde de mesa de juego y paneles de
 madera, con tipografía **Alegreya** vía `google_fonts`. Es un único tema oscuro fijo — no sigue el

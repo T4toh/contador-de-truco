@@ -161,7 +161,8 @@ Hay tres caminos, en este orden:
 ## Convenciones de UI
 
 - Interacción: **tap** en el panel = +1, **long-press** sobre el nombre = renombrar, botón `-` = -1
-  (deshabilitado cuando `_juego.terminada`).
+  (deshabilitado cuando `_juego.terminada`); contadores: Truco y Escoba. En Generala, tap en la
+  celda abre las fichas y no hay botón `-`; long-press en el nombre renombra en los tres juegos.
 - Todo el texto de la UI está en español rioplatense ("Ingresá el nombre", "¿Reiniciar partida?").
 - Colores: fuera de un `CustomPainter`, siempre una constante de `MesaColors` (nunca
   `Theme.of(context).colorScheme` ni `Colors.*` directo) — ver `lib/theme/mesa_colors.dart`. Dentro de
