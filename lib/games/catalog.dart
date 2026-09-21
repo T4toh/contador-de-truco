@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../generala/generala_screen.dart';
 import 'counter_screen.dart';
 import 'game_spec.dart';
 
@@ -58,4 +59,10 @@ class Juego {
 final catalogo = <Juego>[
   Juego.contador(truco),
   Juego.contador(escoba),
+  Juego(
+    titulo: 'Generala',
+    icono: Icons.casino,
+    pantalla: (version) =>
+        GeneralaScreen(key: const ValueKey('generala'), version: version),
+  ),
 ];
