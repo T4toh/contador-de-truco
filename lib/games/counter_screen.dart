@@ -105,7 +105,12 @@ class _CounterScreenState extends State<CounterScreen> {
                 titulo: _tituloPartida(),
                 onReiniciar: _volverAlSetup,
               ),
-              Expanded(child: _tablero(orientacion)),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, restricciones) =>
+                      _tablero(orientacion, restricciones.maxHeight),
+                ),
+              ),
             ],
           ),
         ),
@@ -116,8 +121,12 @@ class _CounterScreenState extends State<CounterScreen> {
   String _tituloPartida() =>
       widget.spec.eligeTope ? 'Partida a ${_juego.tope}' : widget.spec.titulo;
 
-  Widget _tablero(Orientation orientacion) {
-    final filas = layoutFor(_juego.participantes, orientacion);
+  Widget _tablero(Orientation orientacion, double alto) {
+    final filas = layoutFor(
+      _juego.participantes,
+      orientacion,
+      altoDisponible: alto,
+    );
     return Column(
       children: filas
           .map((fila) => Expanded(
@@ -136,8 +145,13 @@ class _CounterScreenState extends State<CounterScreen> {
     final muestra = _juego.muestraHito && hito != null;
     final cruzo = _juego.cruzoElHito(indice);
 
+    final cortos = widget.spec.nombresCortos;
+    final sinRenombrar =
+        _juego.nombres[indice] == widget.spec.nombresPorDefecto[indice];
+
     return ScorePanel(
       nombre: _juego.nombres[indice],
+      nombreCorto: cortos != null && sinRenombrar ? cortos[indice] : null,
       puntaje: _juego.puntajes[indice],
       chip: muestra ? (cruzo ? hito.despues : hito.antes) : null,
       chipActivo: cruzo,

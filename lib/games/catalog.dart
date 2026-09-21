@@ -26,6 +26,7 @@ const escoba = GameSpec(
   participantes: [2, 3, 4],
   topes: [15],
   nombresPorDefecto: ['Jugador 1', 'Jugador 2', 'Jugador 3', 'Jugador 4'],
+  nombresCortos: ['J#1', 'J#2', 'J#3', 'J#4'],
 );
 
 /// Agregar un contador nuevo es agregar una entrada acá. Por ejemplo, el

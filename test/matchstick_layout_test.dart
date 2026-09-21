@@ -116,4 +116,43 @@ void main() {
     final ancho = l.columnas * l.tamanoGrupo + (l.columnas - 1) * l.separacion;
     expect(ancho, lessThanOrEqualTo(180));
   });
+
+  test('escoba en panel alto y angosto: los tres grupos van en una columna', () {
+    // Panel de la grilla 2x2 en un teléfono, ya descontados el botón − y el
+    // puntaje. Antes caía al caso degradado y pintaba grupos de 20.
+    final l = calcularLayout(puntos: 15, espacio: const Size(108, 200));
+    expect(l.columnas, 1);
+    expect(l.filas, 3);
+    expect(l.tamanoGrupo, greaterThanOrEqualTo(44));
+  });
+
+  test('escoba en panel ancho y bajo: los tres grupos van en una fila', () {
+    final l = calcularLayout(puntos: 15, espacio: const Size(300, 70));
+    expect(l.filas, 1);
+    expect(l.columnas, 3);
+  });
+
+  test('sin gruposPorColumna nunca mezcla filas y columnas si el eje único entra',
+      () {
+    for (final ancho in [110.0, 150.0, 320.0, 600.0, 1024.0]) {
+      for (final alto in [120.0, 220.0, 400.0, 768.0]) {
+        for (final puntos in [1, 5, 8, 15]) {
+          final l = calcularLayout(puntos: puntos, espacio: Size(ancho, alto));
+          expect(l.columnas == 1 || l.filas == 1, isTrue,
+              reason:
+                  'ancho=$ancho alto=$alto puntos=$puntos dio ${l.columnas}x${l.filas}');
+        }
+      }
+    }
+  });
+
+  test('el eje único elige el que deja el grupo más grande', () {
+    // 15 puntos = 3 grupos. Alto de sobra, ancho justo: gana la columna.
+    final enColumna = calcularLayout(puntos: 15, espacio: const Size(100, 400));
+    // Mismo espacio al revés: gana la fila, con el mismo tamaño.
+    final enFila = calcularLayout(puntos: 15, espacio: const Size(400, 100));
+    expect(enColumna.columnas, 1);
+    expect(enFila.filas, 1);
+    expect(enColumna.tamanoGrupo, enFila.tamanoGrupo);
+  });
 }
