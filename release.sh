@@ -28,6 +28,12 @@ if ! [[ "$BUILD" =~ ^[0-9]+$ ]]; then
     exit 1
 fi
 
+if ! grep -q "^## \[$VERSION\]" CHANGELOG.md; then
+    echo "❌ CHANGELOG.md no tiene la sección '## [$VERSION] - AAAA-MM-DD'."
+    echo "   Renombrá '## [Sin publicar]' con la versión y la fecha, y agregá el link al pie."
+    exit 1
+fi
+
 if [ ! -f android/key.properties ]; then
     echo "❌ Falta android/key.properties: el APK saldría firmado con el keystore de debug"
     echo "   y Android lo rechazaría como actualización (INSTALL_FAILED_UPDATE_INCOMPATIBLE)."

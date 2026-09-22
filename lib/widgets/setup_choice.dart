@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../changelog/changelog_sheet.dart';
 import '../theme/mesa_colors.dart';
 
 /// Pantalla de setup: título opcional y una columna de botones grandes, uno
@@ -61,7 +62,9 @@ class SetupChoice extends StatelessWidget {
                           foregroundColor: MesaColors.crema,
                           minimumSize: const Size(360, 0),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 22),
+                            horizontal: 24,
+                            vertical: 22,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                             side: const BorderSide(color: MesaColors.dorado),
@@ -78,12 +81,20 @@ class SetupChoice extends StatelessWidget {
           // Solo en el setup: jugando no molesta.
           if (version != null)
             Positioned(
-              right: 12,
-              bottom: 8,
-              child: Text(
-                'v$version',
-                style: textos.bodySmall?.copyWith(
-                  color: MesaColors.crema.withValues(alpha: 0.6),
+              right: 4,
+              bottom: 0,
+              // Tocar la versión abre el changelog.
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => mostrarChangelog(context),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    'v$version',
+                    style: textos.bodySmall?.copyWith(
+                      color: MesaColors.crema.withValues(alpha: 0.6),
+                    ),
+                  ),
                 ),
               ),
             ),

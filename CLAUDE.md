@@ -64,6 +64,18 @@ SHA-256 contra el `digest` que expone la API de GitHub y lanza el instalador.
   diálogo al abrir.
 - El chequeo corre desde `HomeScreen`, nunca desde `main()`.
 
+## Changelog
+
+`CHANGELOG.md` (Keep a Changelog, en español) es un asset: la app lo muestra en un bottom sheet
+al tocar la versión en el setup, y sola la primera vez que arranca una versión distinta a la
+última vista (`Novedades`, clave `ultima_version_vista`; en instalación limpia no muestra nada).
+`lib/changelog/changelog.dart` es el parser mínimo: `## [versión] - fecha`, `### subtítulo`,
+`- viñeta` con continuación indentada; lo demás se ignora. Sin paquete de markdown.
+
+**Cada feature o fix que entra a main se anota en `## [Sin publicar]`.** Al publicar, esa
+sección se renombra `## [X.Y.Z] - AAAA-MM-DD` y se agrega el link al pie; `release.sh` corta si
+la sección de la versión no existe.
+
 ## Arquitectura
 
 App Flutter de contadores de puntaje para juegos de cartas argentinos. Sin backend, sin state
@@ -188,6 +200,10 @@ Hay tres caminos, en este orden:
   así que cualquier toque en un botón tiraba una excepción en los tests. **No sacar esa línea.**
 - Los diálogos usan `RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))` (vía
   `dialogTheme` en `mesaTheme()`).
+- `main()` pone `SystemUiMode.edgeToEdge` y barras del sistema transparentes sin contraste
+  forzado: sin eso Android pinta la barra de gestos con un fondo gris que corta el paño (se veía
+  en la Redmi Pad SE). La `NavigationBar` ya respeta el padding inferior; no agregar `SafeArea`
+  abajo del Scaffold.
 
 ## docs/
 

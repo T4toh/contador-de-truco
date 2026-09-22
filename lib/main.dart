@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'changelog/changelog_sheet.dart';
+import 'changelog/novedades.dart';
 
 import 'games/catalog.dart';
 import 'games/game_storage.dart';
@@ -13,6 +17,18 @@ Future<void> main() async {
   // dos CounterScreen montados a la vez la ejecutarían en paralelo y podrían
   // pisarse entre sí.
   WidgetsFlutterBinding.ensureInitialized();
+  // Edge-to-edge: sin esto Android pinta la barra de gestos con un fondo gris
+  // de contraste que corta el paño. La NavigationBar ya respeta el padding.
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarContrastEnforced: false,
+      statusBarIconBrightness: Brightness.light,
+      systemNavigationBarIconBrightness: Brightness.light,
+    ),
+  );
   try {
     await GameStorage().migrar();
   } catch (e, stack) {
@@ -61,6 +77,9 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final version = await _canal.currentVersionName();
       if (mounted) setState(() => _version = version);
+      if (await Novedades().hayQueMostrar(version) && mounted) {
+        await mostrarChangelog(context);
+      }
       final info = await UpdateChecker(versionActual: version).check();
       if (info != null && mounted) setState(() => _update = info);
     } catch (e) {

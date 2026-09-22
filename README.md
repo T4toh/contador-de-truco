@@ -84,6 +84,11 @@ por su migración.
 
 ---
 
+## 📝 Novedades
+
+`CHANGELOG.md` lleva los cambios por versión. La app lo muestra al tocar la versión en el setup,
+y sola la primera vez que abrís una versión nueva.
+
 ## 🚀 Desarrollo
 
 Requiere el **SDK de Flutter** (Dart SDK `^3.9.2`).
