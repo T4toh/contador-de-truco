@@ -126,7 +126,10 @@ Hay tres caminos, en este orden:
    desbordar en espacios muy chicos.
 
 **Widgets compartidos** (`lib/widgets/`):
-- `FeltBackground` / `WoodPanel` — fondo de paño y panel de madera, la base visual del tema.
+- `FeltBackground` / `WoodPanel` — fondo de paño y panel de madera, la base visual del tema. La
+  trama del paño es una **textura repetida** (tile de 6×6 vía `ImageShader`), no líneas por frame:
+  dibujar ~600 líneas con alpha en cada frame dejaba la Redmi Pad SE en ~40 ms por frame, e Impeller
+  no cachea capas, así que `RepaintBoundary` solo no alcanza. **No volver a `drawLine` en el paint.**
 - `ScorePanel` — panel de un equipo/jugador: nombre, puntaje, chip de hito, botones +/-. Las franjas
   del botón `−` y del puntaje se dimensionan como fracción del ancho del panel (con `clamp`), no
   fijas: con 64 + 96 px fijos, un panel de la grilla 2x2 en teléfono se quedaba sin lugar para los
