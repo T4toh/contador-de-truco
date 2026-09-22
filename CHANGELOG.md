@@ -4,6 +4,12 @@ Todos los cambios notables de Pulpero, del más nuevo al más viejo. El formato 
 [Keep a Changelog](https://keepachangelog.com/es/1.1.0/) y las versiones,
 [SemVer](https://semver.org/lang/es/).
 
+## [Sin publicar]
+
+### Arreglado
+- Las Novedades también se abren al actualizar desde la 1.0.2 o anteriores, que no guardaban la
+  versión vista.
+
 ## [1.1.0] - 2026-09-22
 
 ### Agregado
@@ -71,6 +77,7 @@ Todos los cambios notables de Pulpero, del más nuevo al más viejo. El formato 
 - Contador de Truco: partidas a 15 (malas) o a 30 (buenas), dos equipos, puntos dibujados como
   fósforos.
 
+[Sin publicar]: https://github.com/T4toh/pulpero/compare/v1.1.0...HEAD
 [1.1.0]: https://github.com/T4toh/pulpero/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/T4toh/pulpero/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/T4toh/pulpero/compare/v0.0.2...v1.0.1

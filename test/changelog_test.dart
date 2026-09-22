@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:contador_de_truco/changelog/changelog.dart';
 import 'package:contador_de_truco/changelog/novedades.dart';
 import 'package:contador_de_truco/theme/mesa_theme.dart';
+import 'package:contador_de_truco/update/update_checker.dart';
 import 'package:contador_de_truco/widgets/setup_choice.dart';
 
 const _md = '''
@@ -75,6 +76,16 @@ void main() {
       expect(await Novedades().hayQueMostrar('1.1.0'), isFalse);
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getString(Novedades.clave), '1.1.0');
+    });
+
+    test('upgrade desde una versión sin esta función: muestra', () async {
+      // La 1.0.2 nunca guardó la versión vista, pero sí la fecha del último
+      // chequeo de updates: eso distingue upgrade de instalación limpia.
+      SharedPreferences.setMockInitialValues({
+        UpdateChecker.claveUltimoChequeo: 123,
+      });
+      expect(await Novedades().hayQueMostrar('1.1.0'), isTrue);
+      expect(await Novedades().hayQueMostrar('1.1.0'), isFalse);
     });
 
     test('misma versión que la última vista: no muestra', () async {
