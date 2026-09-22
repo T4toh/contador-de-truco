@@ -72,7 +72,8 @@ al tocar la versión en el setup, y sola la primera vez que arranca una versión
 `lib/changelog/changelog.dart` es el parser mínimo: `## [versión] - fecha`, `### subtítulo`,
 `- viñeta` con continuación indentada; lo demás se ignora. Sin paquete de markdown.
 
-**Cada feature o fix que entra a main se anota en `## [Sin publicar]`.** Al publicar, esa
+**Cada feature o fix que entra a main se anota en `## [Sin publicar]`** (crearla arriba de la
+última versión si no existe; no dejarla vacía, el sheet la mostraría sin contenido). Al publicar, esa
 sección se renombra `## [X.Y.Z] - AAAA-MM-DD` y se agrega el link al pie; `release.sh` corta si
 la sección de la versión no existe.
 

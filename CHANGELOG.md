@@ -4,9 +4,11 @@ Todos los cambios notables de Pulpero, del más nuevo al más viejo. El formato 
 [Keep a Changelog](https://keepachangelog.com/es/1.1.0/) y las versiones,
 [SemVer](https://semver.org/lang/es/).
 
-## [Sin publicar]
+## [1.1.0] - 2026-09-22
 
 ### Agregado
+- Novedades en la app: tocá la versión en el setup para ver este changelog. También se abre solo
+  la primera vez que arranca una versión nueva.
 - **Generala**, tercer juego: planilla de 11 casillas para 2 a 6 jugadores, puntaje según el
   reglamento de Ruibal. Tocá una celda y elegí el valor entre los válidos; caras de dado y
   E, F, P, G, G2 como en la planilla de papel. Generala servida gana la partida. Empate
@@ -20,6 +22,7 @@ Todos los cambios notables de Pulpero, del más nuevo al más viejo. El formato 
 - Generala doble (G2) vale 100; no está en el PDF del reglamento pero sí en la planilla de la caja.
 
 ### Arreglado
+- La barra de gestos de Android ya no queda gris: el paño llega hasta abajo.
 - Rendimiento: el paño se dibuja como textura repetida. En tablets de gama baja cada frame
   tardaba ~40 ms; ahora ~6 ms. Afecta a los tres juegos.
 - Renombrar no toca la pantalla si se cerró mientras el diálogo estaba abierto.
@@ -68,7 +71,7 @@ Todos los cambios notables de Pulpero, del más nuevo al más viejo. El formato 
 - Contador de Truco: partidas a 15 (malas) o a 30 (buenas), dos equipos, puntos dibujados como
   fósforos.
 
-[Sin publicar]: https://github.com/T4toh/pulpero/compare/v1.0.2...HEAD
+[1.1.0]: https://github.com/T4toh/pulpero/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/T4toh/pulpero/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/T4toh/pulpero/compare/v0.0.2...v1.0.1
 [0.0.2]: https://github.com/T4toh/pulpero/compare/v0.0.1...v0.0.2

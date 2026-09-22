@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:contador_de_truco/changelog/changelog.dart';
@@ -111,7 +112,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Novedades'), findsOneWidget);
-    // El CHANGELOG.md real: la primera sección siempre existe.
-    expect(find.textContaining('Sin publicar'), findsOneWidget);
+    // El CHANGELOG.md real: se ve el título de la primera sección.
+    final md = await rootBundle.loadString('CHANGELOG.md');
+    expect(find.text(parsearChangelog(md).first.titulo), findsOneWidget);
   });
 }

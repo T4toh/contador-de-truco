@@ -166,7 +166,9 @@ navegación usa `IndexedStack`, así que cambiar de tab no pierde la partida de 
 
 ## 🛠️ Pendientes conocidos
 
-- **Papa**: agregar el juego (reglas y contador).
+- **Papa** (el "10.000", dados tipo Farkle): las fuentes online se contradicen en los valores y no
+  hay un reglamento de referencia. Falta conseguir reglas confiables de alguien que la juegue; para
+  la app es un contador de puntos con incrementos variables por turno y deshacer.
 - **Reglas de todos los juegos**: `docs/` tiene Truco, Escoba y Generala; cada juego que se agregue
   tiene que entrar con sus reglas.
 - **Otros juegos**: investigar qué más se juega con dados o con cartas españolas y falta acá
