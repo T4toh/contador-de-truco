@@ -45,7 +45,7 @@ class Planilla extends StatelessWidget {
             _cabecera(context, etiquetas, angosto),
             for (final c in Casilla.values)
               _fila(context, c, etiquetas, altoEfectivo),
-            _total(context, etiquetas),
+            _total(context, etiquetas, angosto),
           ];
 
           final tabla = apretado
@@ -183,7 +183,7 @@ class Planilla extends StatelessWidget {
     );
   }
 
-  Widget _total(BuildContext context, double etiquetas) {
+  Widget _total(BuildContext context, double etiquetas, bool angosto) {
     final estilo = Theme.of(context).textTheme.titleMedium?.copyWith(
       color: MesaColors.doradoClaro,
       fontWeight: FontWeight.w700,
@@ -196,7 +196,15 @@ class Planilla extends StatelessWidget {
         children: [
           SizedBox(
             width: etiquetas,
-            child: Center(child: Text('Total', style: estilo)),
+            // En angosto "Total" no entra en una línea y se partía en dos.
+            child: Center(
+              child: Text(
+                angosto ? 'Tot.' : 'Total',
+                style: estilo,
+                maxLines: 1,
+                softWrap: false,
+              ),
+            ),
           ),
           for (var j = 0; j < juego.participantes; j++)
             Expanded(
