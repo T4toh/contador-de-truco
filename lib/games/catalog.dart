@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../generala/generala_screen.dart';
+import 'counter_screen.dart';
 import 'game_spec.dart';
 
 const truco = GameSpec(
@@ -29,6 +31,38 @@ const escoba = GameSpec(
   nombresCortos: ['J#1', 'J#2', 'J#3', 'J#4'],
 );
 
-/// Agregar un contador nuevo es agregar una entrada acá. Por ejemplo, el
-/// gallo (truco de a tres) sería otra const con `participantes: [3]`.
-const catalogo = <GameSpec>[truco, escoba];
+/// Una pestaña de la app: qué mostrar en la barra y qué pantalla montar.
+///
+/// Los contadores (Truco, Escoba) se describen con un GameSpec y comparten
+/// CounterScreen. Un juego con otro modelo, como Generala, trae su pantalla.
+class Juego {
+  final String titulo;
+  final IconData icono;
+  final Widget Function(String? version) pantalla;
+
+  const Juego({
+    required this.titulo,
+    required this.icono,
+    required this.pantalla,
+  });
+
+  Juego.contador(GameSpec spec)
+      : titulo = spec.titulo,
+        icono = spec.icono,
+        pantalla = ((version) =>
+            CounterScreen(key: ValueKey(spec.id), spec: spec, version: version));
+}
+
+/// Agregar un juego es agregar una entrada acá. Un contador nuevo —el gallo,
+/// truco de a tres— sería otro GameSpec con `participantes: [3]` envuelto en
+/// `Juego.contador`.
+final catalogo = <Juego>[
+  Juego.contador(truco),
+  Juego.contador(escoba),
+  Juego(
+    titulo: 'Generala',
+    icono: Icons.casino,
+    pantalla: (version) =>
+        GeneralaScreen(key: const ValueKey('generala'), version: version),
+  ),
+];

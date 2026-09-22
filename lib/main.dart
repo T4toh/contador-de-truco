@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'games/catalog.dart';
-import 'games/counter_screen.dart';
 import 'games/game_storage.dart';
 import 'theme/mesa_theme.dart';
 import 'update/update_checker.dart';
@@ -89,8 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: IndexedStack(
                 index: _seleccionado,
                 children: [
-                  for (final spec in catalogo)
-                  CounterScreen(spec: spec, version: _version),
+                  for (final juego in catalogo) juego.pantalla(_version),
                 ],
               ),
             ),
@@ -101,8 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedIndex: _seleccionado,
         onDestinationSelected: (i) => setState(() => _seleccionado = i),
         destinations: [
-          for (final spec in catalogo)
-            NavigationDestination(icon: Icon(spec.icono), label: spec.titulo),
+          for (final juego in catalogo)
+            NavigationDestination(icon: Icon(juego.icono), label: juego.titulo),
         ],
       ),
     );

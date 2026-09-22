@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../theme/mesa_colors.dart';
 import '../widgets/felt_background.dart';
 import '../widgets/game_header.dart';
 import '../widgets/name_dialog.dart';
 import '../widgets/score_panel.dart';
+import '../widgets/setup_choice.dart';
 import '../widgets/winner_bottom_sheet.dart';
 import 'game_spec.dart';
 import 'game_storage.dart';
@@ -86,7 +86,7 @@ class _CounterScreenState extends State<CounterScreen> {
           : 'Nombre del equipo',
       actual: _juego.nombres[indice],
     );
-    if (nombre == null) return;
+    if (!mounted || nombre == null) return;
     setState(() => _juego.renombrar(indice, nombre));
     _storage.guardar(_juego);
   }
@@ -216,61 +216,12 @@ class _CounterScreenState extends State<CounterScreen> {
     required String Function(int) etiqueta,
     required void Function(int) alElegir,
   }) {
-    final version = widget.version;
-    return SafeArea(
-      child: Stack(
-        children: [
-          Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (titulo != null) ...[
-                    Text(titulo,
-                        style: Theme.of(context).textTheme.headlineMedium),
-                    const SizedBox(height: 28),
-                  ],
-                  ...opciones.map(
-                    (o) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: FilledButton.tonal(
-                        onPressed: () => alElegir(o),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: MesaColors.maderaClara,
-                          foregroundColor: MesaColors.crema,
-                          minimumSize: const Size(360, 0),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 22),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            side: const BorderSide(color: MesaColors.dorado),
-                          ),
-                        ),
-                        child: Text(
-                          etiqueta(o),
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Solo en el setup: jugando no molesta.
-          if (version != null)
-            Positioned(
-              right: 12,
-              bottom: 8,
-              child: Text(
-                'v$version',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: MesaColors.crema.withValues(alpha: 0.6),
-                    ),
-              ),
-            ),
-        ],
-      ),
+    return SetupChoice(
+      titulo: titulo,
+      opciones: opciones,
+      etiqueta: etiqueta,
+      alElegir: alElegir,
+      version: widget.version,
     );
   }
 }

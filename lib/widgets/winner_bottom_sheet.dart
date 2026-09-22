@@ -6,10 +6,14 @@ class WinnerBottomSheet extends StatelessWidget {
   final String winnerName;
   final VoidCallback onReset;
 
+  /// Reemplaza al "¡GANÓ `<nombre>`!" por defecto. Generala lo usa en el empate.
+  final String? titulo;
+
   const WinnerBottomSheet({
     super.key,
     required this.winnerName,
     required this.onReset,
+    this.titulo,
   });
 
   @override
@@ -30,7 +34,7 @@ class WinnerBottomSheet extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              '¡GANÓ $winnerName!',
+              titulo ?? '¡GANÓ $winnerName!',
               style: Theme.of(context).textTheme.displaySmall,
               textAlign: TextAlign.center,
             ),

@@ -79,17 +79,20 @@ nunca dejar que un fallo de migración tire una pantalla en blanco). Después, `
 (tema único vía `mesaTheme()`) → `HomeScreen` con `NavigationBar` + `IndexedStack`. El `IndexedStack`
 es intencional: mantiene vivo el estado de cada juego al cambiar de tab.
 
-**Un juego = una entrada de `lib/games/catalog.dart`**, no un archivo ni una pantalla. `GameSpec`
-(`lib/games/game_spec.dart`) es puro dato: id (también prefijo de persistencia), título, ícono,
-participantes posibles, topes posibles, nombres por defecto y un `Hito` opcional (el "pasa a las
-buenas"). Agregar un juego es agregar una `const GameSpec` al catálogo — no hay UI que tocar.
+**Un juego = una entrada de `lib/games/catalog.dart`.** `catalogo` es una `List<Juego>`: título,
+ícono y un constructor de pantalla. Los contadores (Truco, Escoba) se describen con un `GameSpec`
+(`lib/games/game_spec.dart`, puro dato: id, participantes, topes, nombres, `Hito` opcional) y se
+envuelven con `Juego.contador(spec)`, que monta `CounterScreen`. Un juego con otro modelo trae su
+pantalla: Generala es `lib/generala/` entero (`Casilla`/`Jugada` en `reglas.dart`, `GeneralaGame`,
+`GeneralaStorage` con un JSON bajo `generala_partida`, `GeneralaScreen` + `Planilla` +
+`JugadaSheet`). No pasa por `GameStorage` ni por `schema_version`.
 
-**`CounterScreen`** (`lib/games/counter_screen.dart`) es la única pantalla, para cualquier juego:
-recibe un `GameSpec` y decide solo qué preguntar en el setup (tope si `spec.eligeTope`, cantidad de
-participantes si `spec.eligeParticipantes`) y cómo se acomodan los paneles (`panel_layout.dart`,
-según orientación y cantidad). Ciclo de vida: `_juego.empezada == false` → setup → `_empezar` → vista
-de partida (`GameHeader` + tablero) → al llegar al tope, `terminada = true` + `WinnerBottomSheet` no
-dismissible → "Nueva partida" vuelve al setup.
+**`CounterScreen`** (`lib/games/counter_screen.dart`) es la pantalla de los contadores (Truco,
+Escoba), para cualquier `GameSpec`: recibe el spec y decide solo qué preguntar en el setup (tope si
+`spec.eligeTope`, cantidad de participantes si `spec.eligeParticipantes`) y cómo se acomodan los
+paneles (`panel_layout.dart`, según orientación y cantidad). Ciclo de vida: `_juego.empezada ==
+false` → setup → `_empezar` → vista de partida (`GameHeader` + tablero) → al llegar al tope,
+`terminada = true` + `WinnerBottomSheet` no dismissible → "Nueva partida" vuelve al setup.
 
 **`ScoreGame`** (`lib/games/score_game.dart`) tiene el estado y las reglas — sumar con `.clamp(0,
 tope)`, detectar ganador, el hito de las buenas — sin ninguna dependencia de widgets. Por eso se
@@ -123,7 +126,10 @@ Hay tres caminos, en este orden:
    desbordar en espacios muy chicos.
 
 **Widgets compartidos** (`lib/widgets/`):
-- `FeltBackground` / `WoodPanel` — fondo de paño y panel de madera, la base visual del tema.
+- `FeltBackground` / `WoodPanel` — fondo de paño y panel de madera, la base visual del tema. La
+  trama del paño es una **textura repetida** (tile de 6×6 vía `ImageShader`), no líneas por frame:
+  dibujar ~600 líneas con alpha en cada frame dejaba la Redmi Pad SE en ~40 ms por frame, e Impeller
+  no cachea capas, así que `RepaintBoundary` solo no alcanza. **No volver a `drawLine` en el paint.**
 - `ScorePanel` — panel de un equipo/jugador: nombre, puntaje, chip de hito, botones +/-. Las franjas
   del botón `−` y del puntaje se dimensionan como fracción del ancho del panel (con `clamp`), no
   fijas: con 64 + 96 px fijos, un panel de la grilla 2x2 en teléfono se quedaba sin lugar para los
@@ -131,9 +137,11 @@ Hay tres caminos, en este orden:
   `spec.nombresCortos` (`J#1`); un nombre puesto por el usuario no se abrevia nunca.
 - `GameHeader` — título de la partida + botón de reinicio.
 - `NameDialog` — diálogo para renombrar.
+- `SetupChoice` — pantalla de setup con botones grandes; la usan `CounterScreen` y `GeneralaScreen`.
 - `MatchstickCounter` — dibuja el puntaje como fósforos (`CustomPainter`): grupos de 5, 4 lados de un
   cuadrado más la diagonal.
-- `WinnerBottomSheet` — pantalla de ganador, recibe `onReset`.
+- `WinnerBottomSheet` — pantalla de ganador, recibe `onReset`; `titulo` opcional reemplaza el "¡GANÓ
+  `<nombre>`!" por defecto (Generala lo usa para el empate).
 - `UpdateBanner` — aviso de versión nueva; orquesta permiso → descarga → SHA-256 → instalador.
 
 ## Reglas de juego codificadas
@@ -148,11 +156,19 @@ Hay tres caminos, en este orden:
   (`layoutFor`).
 - Los puntajes se hacen `.clamp(0, tope)` en `ScoreGame.sumar`, así que restar nunca va a negativo ni
   sumar pasa del tope.
+- **Generala** (`lib/generala/reglas.dart`): reglamento Ruibal, citado en el comentario del enum.
+  Once casillas; números cantidad × número; escalera 20, full 30, póker 40, +5 servidos; generala
+  60; generala doble 100; cualquier generala servida termina la partida. Empate en el total =
+  varios `ganadores`. `Casilla.opciones` es la única tabla de puntajes: cambiar una regla es tocar
+  ahí. `Casilla.simbolo` es la etiqueta de la tabla (caras de dado y E/F/P/G/G2, como en la
+  planilla de papel).
 
 ## Convenciones de UI
 
 - Interacción: **tap** en el panel = +1, **long-press** sobre el nombre = renombrar, botón `-` = -1
-  (deshabilitado cuando `_juego.terminada`).
+  (deshabilitado cuando `_juego.terminada`); contadores: Truco y Escoba. En Generala, tap en la
+  celda abre las fichas y no hay botón `-`; long-press en el nombre renombra en los tres juegos, y
+  en Generala también el tap sobre el nombre.
 - Todo el texto de la UI está en español rioplatense ("Ingresá el nombre", "¿Reiniciar partida?").
 - Colores: fuera de un `CustomPainter`, siempre una constante de `MesaColors` (nunca
   `Theme.of(context).colorScheme` ni `Colors.*` directo) — ver `lib/theme/mesa_colors.dart`. Dentro de
@@ -175,6 +191,5 @@ Hay tres caminos, en este orden:
 
 ## docs/
 
-`docs/*.md` son las reglas completas de cada juego, no documentación de código. `docs/generala.md`
-existe pero Generala **no está implementada** — es el próximo juego candidato, y su planilla de 13
-casillas no encaja en el patrón "contador de puntos" actual.
+`docs/*.md` son las reglas completas de cada juego, no documentación de código. Generala sigue el
+reglamento de Ruibal, con el link al PDF en el doc; cualquier otra variante se descarta a propósito.
