@@ -52,6 +52,7 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
       builder: (context) => JugadaSheet(
         casilla: casilla,
         jugador: _juego.nombres[jugador],
+        opciones: _juego.opciones(jugador, casilla),
         tieneValor: _juego.valor(jugador, casilla) != null,
         onElegir: (jugada) => _anotar(jugador, casilla, jugada),
       ),

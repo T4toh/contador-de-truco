@@ -29,9 +29,28 @@ void main() {
     expect(g.planilla.length, 4);
   });
 
-  test('empezar clampea a 2..6', () {
+  test('empezar clampea a 2..8', () {
     expect((GeneralaGame.nueva()..empezar(1)).participantes, 2);
-    expect((GeneralaGame.nueva()..empezar(9)).participantes, 6);
+    expect((GeneralaGame.nueva()..empezar(9)).participantes, 8);
+  });
+
+  test('generala doble solo con generala anotada con puntos', () {
+    final g = GeneralaGame.nueva()..empezar(2);
+    final doble = Casilla.doble.opciones[1]; // 100
+    expect(g.opciones(0, Casilla.doble), [tachar]);
+    g.anotar(0, Casilla.doble, doble);
+    expect(g.valor(0, Casilla.doble), isNull, reason: 'sin generala no anota');
+
+    g.anotar(0, Casilla.generala, tachar);
+    expect(g.opciones(0, Casilla.doble), [tachar], reason: 'tachada no cuenta');
+
+    g.anotar(0, Casilla.generala, Casilla.generala.opciones[1]); // 60
+    expect(g.opciones(0, Casilla.doble).length, 3);
+    g.anotar(0, Casilla.doble, doble);
+    expect(g.valor(0, Casilla.doble), 100);
+
+    g.anotar(1, Casilla.doble, tachar);
+    expect(g.valor(1, Casilla.doble), 0, reason: 'tachar siempre se puede');
   });
 
   test('anotar escribe el valor y total suma los no nulos', () {
