@@ -9,6 +9,9 @@ class JugadaSheet extends StatelessWidget {
   final Casilla casilla;
   final String jugador;
 
+  /// Lo que se puede anotar ahora; lo decide GeneralaGame.opciones.
+  final List<Jugada> opciones;
+
   /// Si la celda ya tenía valor, se ofrece "Borrar".
   final bool tieneValor;
   final void Function(Jugada? jugada) onElegir;
@@ -17,6 +20,7 @@ class JugadaSheet extends StatelessWidget {
     super.key,
     required this.casilla,
     required this.jugador,
+    required this.opciones,
     required this.tieneValor,
     required this.onElegir,
   });
@@ -59,7 +63,7 @@ class JugadaSheet extends StatelessWidget {
               spacing: 10,
               runSpacing: 10,
               children: [
-                for (final j in casilla.opciones) _ficha(context, j),
+                for (final j in opciones) _ficha(context, j),
                 if (tieneValor)
                   OutlinedButton(
                     onPressed: () {

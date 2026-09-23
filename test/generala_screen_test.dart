@@ -33,7 +33,7 @@ void main() {
 
     expect(find.text('¿Cuántos jugadores?'), findsOneWidget);
     expect(find.text('Puntaje según reglamento Ruibal'), findsOneWidget);
-    for (var n = 2; n <= 6; n++) {
+    for (var n = 2; n <= 8; n++) {
       expect(find.text('$n jugadores'), findsOneWidget);
     }
 
@@ -133,7 +133,7 @@ void main() {
     expect(find.text('Jugador 3'), findsOneWidget);
   });
 
-  testWidgets('6 jugadores en landscape de celular no desbordan', (
+  testWidgets('8 jugadores en landscape de celular no desbordan', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(800, 360);
@@ -145,14 +145,14 @@ void main() {
     );
     await tester.pump();
     await tester.scrollUntilVisible(
-      find.text('6 jugadores'),
+      find.text('8 jugadores'),
       100,
       scrollable: find.byType(Scrollable).first,
     );
-    await tester.tap(find.text('6 jugadores'));
+    await tester.tap(find.text('8 jugadores'));
     await tester.pump();
     expect(tester.takeException(), isNull);
-    // A 800x360 el ancho de columna (~102px) no baja del umbral angosto
+    // A 800x360 el ancho de columna (~83px) no baja del umbral angosto
     // (72px), así que la planilla no entra en modo angosto acá; lo que
     // importa en este viewport es que no desborde.
     expect(
@@ -168,7 +168,7 @@ void main() {
     );
   });
 
-  testWidgets('6 jugadores en portrait usan nombres cortos', (tester) async {
+  testWidgets('8 jugadores en portrait usan nombres cortos', (tester) async {
     tester.view.physicalSize = const Size(390, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -177,11 +177,11 @@ void main() {
       MaterialApp(theme: mesaTheme(), home: const GeneralaScreen()),
     );
     await tester.pump();
-    await tester.tap(find.text('6 jugadores'));
+    await tester.tap(find.text('8 jugadores'));
     await tester.pump();
     expect(find.text('J#1'), findsOneWidget);
-    expect(find.text('J#6'), findsOneWidget);
-    expect(find.byIcon(Icons.edit), findsNWidgets(6));
+    expect(find.text('J#8'), findsOneWidget);
+    expect(find.byIcon(Icons.edit), findsNWidgets(8));
     expect(tester.takeException(), isNull);
   });
 }

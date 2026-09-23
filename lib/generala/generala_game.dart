@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'reglas.dart';
 
 const minJugadores = 2;
-const maxJugadores = 6;
+const maxJugadores = 8;
 
 const nombresPorDefecto = [
   'Jugador 1',
@@ -13,10 +13,12 @@ const nombresPorDefecto = [
   'Jugador 4',
   'Jugador 5',
   'Jugador 6',
+  'Jugador 7',
+  'Jugador 8',
 ];
 
 /// Para columnas angostas, mientras el nombre siga siendo el de fábrica.
-const nombresCortos = ['J#1', 'J#2', 'J#3', 'J#4', 'J#5', 'J#6'];
+const nombresCortos = ['J#1', 'J#2', 'J#3', 'J#4', 'J#5', 'J#6', 'J#7', 'J#8'];
 
 /// Estado y reglas de una partida de Generala. Sin widgets: se testea directo.
 ///
@@ -68,8 +70,24 @@ class GeneralaGame {
 
   int? valor(int jugador, Casilla casilla) => planilla[jugador][casilla.index];
 
+  /// Las jugadas que este jugador puede anotar en esa casilla. La generala
+  /// doble solo admite puntos si ya anotó generala con puntos; si no, solo
+  /// tachar.
+  List<Jugada> opciones(int jugador, Casilla casilla) {
+    if (casilla == Casilla.doble && !_tieneGenerala(jugador)) return [tachar];
+    return casilla.opciones;
+  }
+
+  bool _tieneGenerala(int jugador) =>
+      (valor(jugador, Casilla.generala) ?? 0) > 0;
+
   void anotar(int jugador, Casilla casilla, Jugada jugada) {
     if (terminada) return;
+    if (casilla == Casilla.doble &&
+        jugada.valor > 0 &&
+        !_tieneGenerala(jugador)) {
+      return;
+    }
     planilla[jugador][casilla.index] = jugada.valor;
     if (jugada.ganaPartida) {
       terminada = true;
